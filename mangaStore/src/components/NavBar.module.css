@@ -1,0 +1,89 @@
+body {
+    display: inline;
+    margin: 0px;
+}
+
+.nav-bar,
+button {
+    background-color: black;
+    overflow: hidden;
+    padding-top: 16px;
+}
+
+/* Style the links inside the navigation bar */
+.nav-bar a,
+button {
+    display: block;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 30px;
+    text-decoration: none;
+    font-size: 20px;
+    border: none;
+}
+
+/* Change the color of links on hover */
+.nav-bar a:hover,
+button:hover,
+input:hover {
+    color: #b974ff;
+    cursor: pointer;
+}
+
+/* Add an active class to highlight the current page */
+.nav-bar a.active,
+button.active,
+input.active {
+    background-color: #b369fe;
+    color: black;
+}
+
+.nav-bar input[type=text] {
+    padding: 6px;
+    margin-top: 8px;
+    font-size: 15px;
+    border: none;
+    background-color: black;
+    border-radius: 20px;
+}
+
+.nav-bar button[type=submit] {
+    padding-left: 60px;
+    padding-right: 10px;
+}
+
+/* Hide the link that should open and close the nav-bar on small screens */
+.nav-bar .icon {
+    display: none;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+
+.site-logo {
+    float: left;
+    margin-left: 22.5%;
+}
+
+.site-logo a img {
+    max-width: 40px;
+    max-height: 48px;
+}
+
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). 
+    Show the link that contains should open and close the nav-bar (.icon) */
+@media screen and (max-width: 600px) {
+    .nav-bar a:not(:first-child) {
+        display: none;
+    }
+
+    .nav-bar a.icon {
+        float: right;
+        display: block;
+    }
+}
