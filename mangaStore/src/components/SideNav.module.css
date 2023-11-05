@@ -11,34 +11,37 @@
     background-color: rgba(0, 0, 0, 0.75);
     height: 100vh;
     width: 100%;
-    transition: 0.5s;
 }
 
 .sidenav {
     height: 100vh;
-    width: 18%;
+    width: 22%;
     position: fixed;
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: #111;
-    transition: 0.5s;
+    background-image:linear-gradient(rgba(0, 0, 0, 0.527),rgba(0, 0, 0, 0.8)), url('../../public/images/vinlandSaga.jpg');
+    background-size: cover;
+ background-repeat: no-repeat;
+}
+
+.sidenav:hover {
+    transition: 2s;
 }
 
 .sidenav button {
     padding: 6% 0;
     width: 100%;
+    transition: 0.5s;
     font-size: 25px;
-    color: #818181;
-    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    background: transparent;
     display: block;
-    transition: 0.3s;
-    border: none;
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .sidenav button:hover {
-    background-color: black;
-    color: #b369fe;
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 @media screen and (max-height: 450px) {
@@ -50,3 +53,4 @@
         font-size: 18px;
     }
 }
+
