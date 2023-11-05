@@ -1,11 +1,12 @@
-import Header from "./components/Header.jsx";
+import HomePage from "./components/HomePage.jsx";
+import Main from "./components/Main.jsx";
 import NavBar from "./components/NavBar.jsx";
 
 function App() {
   return (
     <div>
-      <NavBar />
-      <Header />
+      {/* <Main /> */}
+      <HomePage />
     </div>
   )
 }

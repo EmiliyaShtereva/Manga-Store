@@ -1,9 +1,19 @@
+import { useState } from 'react'
 import styles from './NavBar.module.css'
+import SideNav from './SideNav';
 
 export default function NavBar() {
+    const [showSideNav, setShowSideNav] = useState(false);
+
+    const navClickHandler = () => {
+        setShowSideNav(true);
+    }
+
     return (
+        <div>
         <nav className={styles['nav-bar']}>
-            <button className={styles['left']}><i className="fa fa-bars"></i></button>
+            <button className={styles['left']} onClick={navClickHandler}><i className="fa fa-bars"></i></button>
+
             <div className={styles['search-container']}>
                 <form>
                     <button className={styles['left']} type="submit"><i className="fa fa-search"></i></button>
@@ -15,11 +25,15 @@ export default function NavBar() {
                     <img src="/images/logo3.png" alt="logo" />
                 </a>
             </div>
-            <div className={styles['right']}><a href="">Register</a></div>
-            <div className={styles['right']}><a href="">Login</a></div>
+            {/* for guests */}
+            <div className={styles['right']}><a href="">Sign-in</a></div>
+            {/*for logged users */}
             {/* <div className={styles['right']}><a href="">Logout</a></div>
             <div className={styles['right']}><a href=""><i className="fa fa-heart"></i></a></div>
             <div className={styles['right']}><a href=""><i className="fa fa-cart-shopping"></i></a></div> */}
         </nav>
+
+        {showSideNav && <SideNav onClose={() => setShowSideNav(false)} />}
+        </div>
     )
 }

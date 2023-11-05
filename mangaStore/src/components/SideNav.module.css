@@ -1,0 +1,52 @@
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.backdrop {
+    background-color: rgba(0, 0, 0, 0.75);
+    height: 100vh;
+    width: 100%;
+    transition: 0.5s;
+}
+
+.sidenav {
+    height: 100vh;
+    width: 18%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    transition: 0.5s;
+}
+
+.sidenav button {
+    padding: 6% 0;
+    width: 100%;
+    font-size: 25px;
+    color: #818181;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: block;
+    transition: 0.3s;
+    border: none;
+}
+
+.sidenav button:hover {
+    background-color: black;
+    color: #b369fe;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+
+    .sidenav button {
+        font-size: 18px;
+    }
+}

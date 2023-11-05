@@ -1,6 +1,6 @@
-import styles from './Header.module.css';
+import styles from './Main.module.css';
 
-export default function Header() {
+export default function Main() {
     return (
         <div className={styles['hero-conteiner']}>
         <div className={styles['image-conteiner']}>
@@ -11,6 +11,7 @@ export default function Header() {
             <h1>Manga Heaven</h1>
             <p>Your number one place for manga</p>
         </div>
+        <button className={styles['full-site']}>Full site</button>
     </div>
     )
 }
