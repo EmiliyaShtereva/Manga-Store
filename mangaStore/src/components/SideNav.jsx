@@ -4,8 +4,8 @@ export default function SideNav({
     onClose
 }) {
     return (
-        <div className={styles['overlay']}>
-            <div className={styles['backdrop']} onClick={onClose}></div>
+        <div className={styles['sidenav-overlay']}>
+            <div className={styles['sidenav-backdrop']} onClick={onClose}></div>
             <div className={styles['sidenav']}>
                 <button>Home</button>
                 <button>Genre</button>

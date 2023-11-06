@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import styles from './NavBar.module.css'
 import SideNav from './SideNav';
+import SignIn from './SignIn';
 
 export default function NavBar() {
     const [showSideNav, setShowSideNav] = useState(false);
+    const [showSignIn, setShowSignIn] = useState(false);
+    // const [showSignUp, setShowSignUp] = useState(false);
 
     const navClickHandler = () => {
         setShowSideNav(true);
+    }
+
+    const signInClickHandler = () => {
+        setShowSignIn(true);
     }
 
     return (
@@ -26,7 +33,7 @@ export default function NavBar() {
                 </a>
             </div>
             {/* for guests */}
-            <div className={styles['right']}><a href="">Sign-in</a></div>
+            <button className={styles['right']} onClick={signInClickHandler}>Sign In</button>
             {/*for logged users */}
             {/* <div className={styles['right']}><a href="">Logout</a></div>
             <div className={styles['right']}><a href=""><i className="fa fa-heart"></i></a></div>
@@ -34,6 +41,11 @@ export default function NavBar() {
         </nav>
 
         {showSideNav && <SideNav onClose={() => setShowSideNav(false)} />}
+
+        {showSignIn && <SignIn onClose={() => setShowSignIn(false)} />}
+
+        {/* {showSignUp && <SignUp onClose={() => setShowSignUp(false)} />} */}
+
         </div>
     )
 }

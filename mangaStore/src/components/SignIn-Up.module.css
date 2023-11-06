@@ -1,0 +1,113 @@
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.backdrop {
+  background-color: rgba(0, 0, 0, 0.75);
+  height: 100vh;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 20;
+}
+
+.modal {
+  width: 45rem;
+  position: absolute;
+  max-height: 90vh;
+  margin: auto;
+  border-radius: 20px;
+  background-color: black;
+  color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+  z-index: 30;
+  margin-top: 7%;
+}
+
+@media (min-width: 930px) {
+  .modal {
+    width: 40rem;
+    left: calc(50% - 20rem);
+    border-radius: 14px;
+  }
+}
+
+.form {
+  padding: 5%;
+}
+
+.conteiner {
+  padding: 1.5%;
+}
+
+.form input[type=text],
+.form input[type=password],
+.form input[type=repeatPassword] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #4e4d4d;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: #222222;
+}
+
+.form .close-btn {
+  position: absolute;
+  right: 25px;
+  top: 20px;
+  background-color: transparent;
+  color: #3f3f3f;
+  font-size: 25px;
+  border: none;
+}
+
+.form .close-btn:hover {
+  background-color: transparent;
+  color: #6c0505;
+  cursor: pointer;
+}
+
+.form .submit-btn {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: large;
+  color: white;
+  background-color: transparent;
+  border: none;
+}
+
+.form .submit-btn:hover {
+  color: #b369fe;
+  cursor: pointer;
+}
+
+.acount-text {
+  color: #4e4d4d;
+  font-size: small;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.forms-btn {
+  background-color: transparent;
+  color: #b369fe;
+  border: none;
+  padding: 0;
+}
+
+.forms-btn:hover {
+  color: #9759d5;
+  cursor: pointer;
+}
