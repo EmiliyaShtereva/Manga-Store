@@ -5,7 +5,7 @@ export default function Main() {
     const navigate = useNavigate();
 
     const onFullSiteClick = () => {
-        navigate('/home-page');
+        navigate('/home');
     }
     
     return (
