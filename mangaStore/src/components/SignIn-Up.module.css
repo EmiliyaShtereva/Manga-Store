@@ -20,7 +20,6 @@
 .modal {
   width: 45rem;
   position: absolute;
-  max-height: 90vh;
   margin: auto;
   border-radius: 20px;
   background-color: black;
@@ -47,9 +46,7 @@
   padding: 1.5%;
 }
 
-.form input[type=text],
-.form input[type=password],
-.form input[type=repeatPassword] {
+.form input {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
@@ -58,6 +55,11 @@
   box-sizing: border-box;
   border-radius: 8px;
   background-color: #222222;
+  color: white;
+}
+
+input.input-error {
+  border-color:  #6c0505;
 }
 
 .form .close-btn {
@@ -93,11 +95,16 @@
   cursor: pointer;
 }
 
+.form .submit-btn:disabled {
+  color: #504f50;
+  cursor: default;
+}
+
 .acount-text {
   color: #4e4d4d;
   font-size: small;
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 0;
 }
 
 .forms-btn {
@@ -110,4 +117,10 @@
 .forms-btn:hover {
   color: #9759d5;
   cursor: pointer;
+}
+
+.error-message {
+  margin-top: 0;
+  color:rgb(168, 2, 2);
+  font-size: small;
 }

@@ -1,6 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 import styles from './Main.module.css';
 
 export default function Main() {
+    const navigate = useNavigate();
+
+    const onFullSiteClick = () => {
+        navigate('/home-page');
+    }
+    
     return (
         <div className={styles['hero-conteiner']}>
         <div className={styles['image-conteiner']}>
@@ -11,7 +18,7 @@ export default function Main() {
             <h1>Manga Heaven</h1>
             <p>Your number one place for manga</p>
         </div>
-        <button className={styles['full-site']}>Full site</button>
+        <button className={styles['full-site']} onClick={onFullSiteClick}>Full site</button>
     </div>
     )
 }

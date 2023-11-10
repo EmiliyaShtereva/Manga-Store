@@ -1,13 +1,16 @@
+import { Route, Routes } from "react-router-dom";
 import HomePage from "./components/HomePage.jsx";
 import Main from "./components/Main.jsx";
-import NavBar from "./components/NavBar.jsx";
 
 function App() {
   return (
-    <div>
-      {/* <Main /> */}
-      <HomePage />
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/home-page" element={<HomePage />}>
+        </Route>
+      </Routes>
+    </>
   )
 }
 

@@ -1,41 +1,95 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SignIn-Up.module.css';
 
+const formInitialstate = {
+    email: '',
+    password: '',
+}
+
 export default function SignIn({
-    onClose
+    onClose,
+    onSignUp
 }) {
-    const [showSignUp, setShowSignUp] = useState(false);
+    const emailInputRef = useRef();
+    const [formValues, setFormValues] = useState(formInitialstate);
+    const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        emailInputRef.current.focus();
+    }, []);
+
+    const changeHandler = (e) => {
+        setFormValues(state => ({
+            ...state,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    const submitHandler = (e) => {
+        e.preventDefault();
+        const filteredValues = Object.values(formValues).filter(value => value.length == 0);
+        if (filteredValues.length > 0) {
+            setErrors(state => ({
+                ...state,
+                emptySpaces: 'All spaces should be filled'
+            }))
+        } else {
+            if (errors.emptySpaces) {
+                setErrors(state => ({ ...state, emptySpaces: '' }));
+            }
+            setFormValues(formInitialstate);
+            // console.log(formValues);
+        }
+    }
 
     return (
         <div className={styles['overlay']}>
             <div className={styles['backdrop']} onClick={onClose}></div>
             <div className={styles['modal']}>
-                <form className={styles['form']} action="" method="">
+                <form className={styles['form']} onSubmit={submitHandler}>
                     <div className={styles['conteiner']}>
-                        <h1 className="title">{showSignUp ? 'Sign Up' : 'Sign In'}</h1>
+                        <h1 className="title">Sign In</h1>
                     </div>
-                    <button className={styles['close-btn']} onClick={onClose}><i className="fa fa-xmark"></i></button>
+                    <button className={styles['close-btn']} type="button" onClick={onClose}><i className="fa fa-xmark"></i></button>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputEmail">Email</label>
-                        <input type="text" id="inputEmail" name="email" className="form-control" placeholder="Email" required="" autofocus="" />
+                        <input
+                            ref={emailInputRef}
+                            type="text"
+                            id="inputEmail"
+                            name="email"
+                            placeholder="Email"
+                            required=""
+                            value={formValues.email}
+                            onChange={changeHandler}
+                            // onBlur={nameValidator}
+                            className={errors.email && styles['input-error']}
+                        />
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputPassword">Password</label>
-                        <input type="password" id="inputPassword" name="password" className="form-control" placeholder="Password" required="" />
+                        <input
+                            type="password"
+                            id="inputPassword"
+                            name="password"
+                            placeholder="Password"
+                            required=""
+                            value={formValues.email}
+                            onChange={changeHandler}
+                            // onBlur={nameValidator}
+                            className={errors.password && styles['input-error']}
+                        />
                     </div>
-                    {showSignUp &&
-                        <div className={styles['conteiner']}>
-                            <label htmlFor="inputRepeatPassword">Repeat Password</label>
-                            <input type="repeatPassword" id="inputRepeatPassword" name="repeatPassword" className="form-control" placeholder="Repeat password" required="" />
-                        </div>
-                    }
-                    <button className={styles['submit-btn']} type="submit">Sign In</button>
+                    <button
+                        className={styles['submit-btn']}
+                        type="submit"
+                        disabled={Object.values(errors).some(x => x)}
+                    >
+                        Sign In
+                    </button>
+                    <p className={styles['error-message']}>{errors.emptySpaces}</p>
+                    <p className={styles['acount-text']}> Don't have an account? Then just <button className={styles['forms-btn']} type="button" onClick={onSignUp}>Sign Up</button>!</p>
                 </form>
-                {showSignUp 
-                    ? <p className={styles['acount-text']}> Already have an account? Then just <button className={styles['forms-btn']} onClick={() => setShowSignUp(false)}>Sign In</button>!</p>
-                    : <p className={styles['acount-text']}> Don't have an account? Then just <button className={styles['forms-btn']} onClick={() => setShowSignUp(true)}>Sign Up</button>!</p>
-                    }
-
             </div>
         </div>
     )

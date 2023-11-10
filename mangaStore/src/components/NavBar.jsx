@@ -2,11 +2,12 @@ import { useState } from 'react'
 import styles from './NavBar.module.css'
 import SideNav from './SideNav';
 import SignIn from './SignIn';
+import SignUp from './SignUp';
 
 export default function NavBar() {
     const [showSideNav, setShowSideNav] = useState(false);
     const [showSignIn, setShowSignIn] = useState(false);
-    // const [showSignUp, setShowSignUp] = useState(false);
+    const [showSignUp, setShowSignUp] = useState(false);
 
     const navClickHandler = () => {
         setShowSideNav(true);
@@ -14,6 +15,16 @@ export default function NavBar() {
 
     const signInClickHandler = () => {
         setShowSignIn(true);
+    }
+
+    const onSignUpCLick = () => {
+        setShowSignIn(false);
+        setShowSignUp(true);
+    }
+
+    const onSignInCLick = () => {
+        setShowSignIn(true);
+        setShowSignUp(false);
     }
 
     return (
@@ -42,9 +53,9 @@ export default function NavBar() {
 
         {showSideNav && <SideNav onClose={() => setShowSideNav(false)} />}
 
-        {showSignIn && <SignIn onClose={() => setShowSignIn(false)} />}
+        {showSignIn && <SignIn onClose={() => setShowSignIn(false)} onSignUp={onSignUpCLick} />}
 
-        {/* {showSignUp && <SignUp onClose={() => setShowSignUp(false)} />} */}
+        {showSignUp && <SignUp onClose={() => setShowSignUp(false)} onSignIn={onSignInCLick} />}
 
         </div>
     )
