@@ -38,7 +38,6 @@ export default function SignIn({
                 setErrors(state => ({ ...state, emptySpaces: '' }));
             }
             setFormValues(formInitialstate);
-            // console.log(formValues);
         }
     }
 

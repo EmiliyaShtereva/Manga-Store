@@ -1,0 +1,8 @@
+.manga-section {
+    background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
+}
+
+.manga-section .heading-text {
+    color: #4e3369;
+    margin: 2%;
+}

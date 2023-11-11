@@ -2,7 +2,7 @@
     height: 100vh;
     background-image: linear-gradient(to bottom,
             black,
-            transparent), url('/images/mangaPanels.jpg');
+            rgba(0, 0, 0, 0.5)), url('/images/mangaPanels.jpg');
     background-size: cover;
 }
 

@@ -59,7 +59,7 @@
 }
 
 input.input-error {
-  border-color:  #6c0505;
+  border-color: #6c0505;
 }
 
 .form .close-btn {
@@ -121,6 +121,6 @@ input.input-error {
 
 .error-message {
   margin-top: 0;
-  color:rgb(168, 2, 2);
+  color: rgb(168, 2, 2);
   font-size: small;
 }

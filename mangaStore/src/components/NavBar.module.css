@@ -1,3 +1,10 @@
+.nav-bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 666;
+}
+
 .nav-bar,
 .nav-bar button {
     border-bottom: 1px solid rgb(21, 21, 21);

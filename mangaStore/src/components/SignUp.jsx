@@ -37,7 +37,6 @@ export default function SignUp({
                 setErrors(state => ({ ...state, emptySpaces: '' }));
             }
             setFormValues(formInitialstate);
-            // console.log(formValues);
         }
     }
 
@@ -56,7 +55,6 @@ export default function SignUp({
 
     const addressValidator = () => {
         if (formValues.address.length < 5) {
-            console.log('ok');
             setErrors(state => ({
                 ...state,
                 address: 'Address should be at least 5 characters'
