@@ -3,6 +3,7 @@ import styles from './NavBar.module.css'
 import SideNav from './SideNav';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import { Link } from 'react-router-dom';
 
 export default function NavBar() {
     const [showSideNav, setShowSideNav] = useState(false);
@@ -39,9 +40,9 @@ export default function NavBar() {
                     </form>
                 </div>
                 <div className={styles['site-logo']}>
-                    <a href="">
+                    <Link to="/home">
                         <img src="/images/logo3.png" alt="logo" />
-                    </a>
+                    </Link>
                 </div>
                 {/* for guests */}
                 <button className={styles['right']} onClick={signInClickHandler}>Sign In</button>
