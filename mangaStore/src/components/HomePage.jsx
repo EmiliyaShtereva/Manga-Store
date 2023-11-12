@@ -1,3 +1,4 @@
+import Footer from './Footer';
 import styles from './HomePage.module.css';
 import HomePageMangaSection from './HomePageMangaSection';
 import HomePageSlider from './HomePageSlider';
@@ -16,6 +17,7 @@ export default function HomePage() {
                 <h2 className={styles['heading-text']}>Coming Soon</h2>
                 <HomePageMangaSection />
             </div>
+            <Footer />
         </>
     )
 }

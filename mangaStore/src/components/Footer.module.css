@@ -1,0 +1,57 @@
+.footer {
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 25vh;
+    border-top: 0.2vh solid rgb(21, 21, 21);
+    background-color: black;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.footer .site-logo {
+    padding: 2vh 80vh 0 0;
+}
+
+.footer .site-logo img {
+    max-width: 48px;
+    max-height: 48px;
+}
+
+.footer .site-logo p {
+    color: white;
+    padding: 0;
+}
+
+.footer .links {
+    text-align: center;
+    padding: 2vh 0 0 50vh;
+    text-decoration: none;
+}
+
+.footer .links a {
+    color: white;
+    text-align: center;
+    padding: 2vh 7vh 0 0;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #b974ff;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    .footer a:not(:first-child) {
+        display: none;
+    }
+
+    .footer a.icon {
+        float: right;
+        display: block;
+    }
+}
