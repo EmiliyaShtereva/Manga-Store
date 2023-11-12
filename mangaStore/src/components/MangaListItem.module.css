@@ -1,5 +1,6 @@
 .card {
    width: 17%;
+   /* height: 70vh; */
    border-radius: 10px;
 }
 
@@ -30,21 +31,28 @@
 .card .name {
    color: white;
    text-align: center;
-   font-size: x-large;
+   font-size: 3vh;
    font-weight: bold;
    margin-top: 4%;
    margin-bottom: 0;
+   overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .card .author {
    color: rgb(95, 94, 94);
    text-align: center;
+   font-size: 2vh;
    margin-top: 0;
 }
 
 .card .price {
    color: white;
    text-align: center;
-   font-size: larger;
+   font-size: 3vh;
    margin: 2%;
 }

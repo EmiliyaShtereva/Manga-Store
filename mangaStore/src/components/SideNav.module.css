@@ -1,5 +1,5 @@
 .sidenav-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -15,7 +15,7 @@
 
 .sidenav {
     height: 100vh;
-    width: 22%;
+    width: 50vh;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -25,15 +25,11 @@
     background-repeat: no-repeat;
 }
 
-.sidenav:hover {
-    transition: 2s;
-}
-
 .sidenav button {
     padding: 6% 0;
     width: 100%;
     transition: 0.5s;
-    font-size: 25px;
+    font-size: 4vh;
     color: white;
     background: transparent;
     display: block;

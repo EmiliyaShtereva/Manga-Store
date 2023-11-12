@@ -2,15 +2,17 @@
     position: fixed;
     top: 0;
     width: 100%;
+    height: 55px;
     z-index: 666;
 }
 
 .nav-bar,
 .nav-bar button {
-    border-bottom: 1px solid rgb(21, 21, 21);
+    border-bottom: 0.2vh solid rgb(21, 21, 21);
     background-color: black;
     overflow: hidden;
     padding: 16px 13px;
+    padding-bottom: 0;
 }
 
 .nav-bar a,
@@ -52,23 +54,23 @@
     padding-right: 10px;
 }
 
-.right {
+.nav-bar .right {
     float: right;
 }
 
-.left {
+.nav-bar .left {
     float: left;
 }
 
-.site-logo {
+.nav-bar .site-logo {
     position: fixed;
-    top: 1%;
+    top: 0.2vh;
     left: 50%;
     transform: translateX(-50%);
     padding: 0;
 }
 
-.site-logo a img {
+.nav-bar .site-logo a img {
     max-width: 48px;
     max-height: 48px;
 }

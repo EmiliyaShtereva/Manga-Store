@@ -47,7 +47,7 @@ export default function SignIn({
             <div className={styles['modal']}>
                 <form className={styles['form']} onSubmit={submitHandler}>
                     <div className={styles['conteiner']}>
-                        <h1 className="title">Sign In</h1>
+                        <h1 className={styles['title']}>Sign In</h1>
                     </div>
                     <button className={styles['close-btn']} type="button" onClick={onClose}><i className="fa fa-xmark"></i></button>
                     <div className={styles['conteiner']}>
@@ -73,7 +73,7 @@ export default function SignIn({
                             name="password"
                             placeholder="Password"
                             required=""
-                            value={formValues.email}
+                            value={formValues.password}
                             onChange={changeHandler}
                             // onBlur={nameValidator}
                             className={errors.password && styles['input-error']}

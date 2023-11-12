@@ -29,7 +29,7 @@ export default function NavBar() {
     }
 
     return (
-        <div>
+        <>
             <nav className={styles['nav-bar']}>
                 <button className={styles['left']} onClick={navClickHandler}><i className="fa fa-bars"></i></button>
 
@@ -58,6 +58,6 @@ export default function NavBar() {
 
             {showSignUp && <SignUp onClose={() => setShowSignUp(false)} onSignIn={onSignInCLick} />}
 
-        </div>
+        </>
     )
 }

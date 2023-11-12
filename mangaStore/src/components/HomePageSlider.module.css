@@ -1,6 +1,7 @@
 .parent-container {
   margin-top: 76px;
   cursor: pointer;
+  border-bottom: 0.2vh solid rgb(21, 21, 21);
 }
 
 .navigation-buttons .previous,
@@ -75,7 +76,7 @@
 
 .slider-carousel .status {
   width: 80%;
-  font-size: large;
+  font-size: 3vh;
   font-weight: 600;
   margin: 10%;
   color: #4e3369;
@@ -83,7 +84,7 @@
 
 .slider-carousel .genre {
   width: 80%;
-  font-size: large;
+  font-size: 3vh;
   font-weight: 600;
   margin: 10%;
   margin-top: 0;
@@ -98,7 +99,7 @@
 
 .slider-carousel .synopsis {
   width: 80%;
-  font-size: large;
+  font-size: 2vh;
   font-weight: 600;
   margin: 10%;
   margin-top: 0;

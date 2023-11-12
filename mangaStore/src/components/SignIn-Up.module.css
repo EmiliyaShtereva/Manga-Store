@@ -18,7 +18,7 @@
 }
 
 .modal {
-  width: 45rem;
+  width: 50vh;
   position: absolute;
   margin: auto;
   border-radius: 20px;
@@ -32,8 +32,8 @@
 
 @media (min-width: 930px) {
   .modal {
-    width: 40rem;
-    left: calc(50% - 20rem);
+    width: 70vh;
+    left: calc(50% - 30vh);
     border-radius: 14px;
   }
 }
@@ -42,12 +42,19 @@
   padding: 5%;
 }
 
-.conteiner {
+.form .conteiner {
   padding: 1.5%;
+  font-size: 2.2vh;
+}
+
+.form .title {
+  font-size: 4vh;
 }
 
 .form input {
   width: 100%;
+  height: 5vh;
+  font-size: 1.7vh;
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
@@ -58,7 +65,8 @@
   color: white;
 }
 
-input.input-error {
+.form input.input-error {
+  font-size: 2vh;
   border-color: #6c0505;
 }
 
@@ -68,12 +76,11 @@ input.input-error {
   top: 20px;
   background-color: transparent;
   color: #3f3f3f;
-  font-size: 25px;
+  font-size: 2.5vh;
   border: none;
 }
 
 .form .close-btn:hover {
-  background-color: transparent;
   color: #6c0505;
   cursor: pointer;
 }
@@ -84,7 +91,7 @@ input.input-error {
   transform: translateX(-50%);
   margin-top: 20px;
   margin-bottom: 20px;
-  font-size: large;
+  font-size: 2.5vh;
   color: white;
   background-color: transparent;
   border: none;
@@ -102,7 +109,7 @@ input.input-error {
 
 .acount-text {
   color: #4e4d4d;
-  font-size: small;
+  font-size: 1.7vh;
   margin-top: 20px;
   margin-bottom: 0;
 }
@@ -112,6 +119,7 @@ input.input-error {
   color: #b369fe;
   border: none;
   padding: 0;
+  font-size: 1.7vh;
 }
 
 .forms-btn:hover {
@@ -122,5 +130,5 @@ input.input-error {
 .error-message {
   margin-top: 0;
   color: rgb(168, 2, 2);
-  font-size: small;
+  font-size: 1.7vh;
 }

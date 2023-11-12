@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './SignIn-Up.module.css';
 
 const formInitialstate = {
-    name: '',
+    firstName: '',
+    lastName: '',
+    username: '',
     address: '',
     email: '',
     password: '',
@@ -40,15 +42,41 @@ export default function SignUp({
         }
     }
 
-    const nameValidator = () => {
-        if (formValues.name.length < 1) {
+    const firstNameValidator = () => {
+        if (formValues.firstName.length < 1) {
             setErrors(state => ({
                 ...state,
-                name: 'Name should have at least 1 character'
+                firstName: 'First name should have at least 1 character'
             }));
         } else {
-            if (errors.name) {
-                setErrors(state => ({ ...state, name: '' }));
+            if (errors.firstName) {
+                setErrors(state => ({ ...state, firstName: '' }));
+            }
+        }
+    }
+
+    const lastNameValidator = () => {
+        if (formValues.lastName.length < 1) {
+            setErrors(state => ({
+                ...state,
+                lastName: 'Last name should have at least 1 character'
+            }));
+        } else {
+            if (errors.lastName) {
+                setErrors(state => ({ ...state, lastName: '' }));
+            }
+        }
+    }
+
+    const usernameValidator = () => {
+        if (formValues.username.length < 1) {
+            setErrors(state => ({
+                ...state,
+                username: 'Username should have at least 1 character'
+            }));
+        } else {
+            if (errors.username) {
+                setErrors(state => ({ ...state, username: '' }));
             }
         }
     }
@@ -119,20 +147,50 @@ export default function SignUp({
                     </div>
                     <button className={styles['close-btn']} type="button" onClick={onClose}><i className="fa fa-xmark"></i></button>
                     <div className={styles['conteiner']}>
-                        <label htmlFor="inputName">Name</label>
+                        <label htmlFor="inputFirstName">First name</label>
                         <input
                             ref={nameInputRef}
                             type="text"
-                            id="inputName"
-                            name="name"
-                            placeholder="Name"
+                            id="inputFirstName"
+                            name="firstName"
+                            placeholder="First name"
                             required=""
-                            value={formValues.name}
+                            value={formValues.firstName}
                             onChange={changeHandler}
-                            onBlur={nameValidator}
-                            className={errors.name && styles['input-error']}
+                            onBlur={firstNameValidator}
+                            className={errors.firstName && styles['input-error']}
                         />
-                        {errors.name && <p className={styles['error-message']}>{errors.name}</p>}
+                        {errors.firstName && <p className={styles['error-message']}>{errors.firstName}</p>}
+                    </div>
+                    <div className={styles['conteiner']}>
+                        <label htmlFor="inputLastName">Last name</label>
+                        <input
+                            type="text"
+                            id="inputLastName"
+                            name="lastName"
+                            placeholder="Last name"
+                            required=""
+                            value={formValues.lastName}
+                            onChange={changeHandler}
+                            onBlur={lastNameValidator}
+                            className={errors.lastName && styles['input-error']}
+                        />
+                        {errors.lastName && <p className={styles['error-message']}>{errors.lastName}</p>}
+                    </div>
+                    <div className={styles['conteiner']}>
+                        <label htmlFor="inputUsername">Username</label>
+                        <input
+                            type="text"
+                            id="inputUsername"
+                            name="username"
+                            placeholder="Username"
+                            required=""
+                            value={formValues.username}
+                            onChange={changeHandler}
+                            onBlur={usernameValidator}
+                            className={errors.username && styles['input-error']}
+                        />
+                        {errors.username && <p className={styles['error-message']}>{errors.username}</p>}
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputAddress">Address</label>
