@@ -20,7 +20,7 @@
     z-index: 1;
     top: 0;
     left: 0;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.527), rgba(0, 0, 0, 0.8)), url('../../public/images/vinlandSaga.jpg');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.527), rgba(0, 0, 0, 0.8)), url('/images/vinlandSaga.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 }

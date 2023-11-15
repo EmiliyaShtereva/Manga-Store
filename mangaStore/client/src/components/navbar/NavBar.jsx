@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import styles from './NavBar.module.css'
-import SideNav from './SideNav';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
 import { Link } from 'react-router-dom';
+import SideNav from './side-nav/SideNav';
+import SignIn from './sign-forms/SignIn';
+import SignUp from './sign-forms/SignUp';
 
 export default function NavBar() {
     const [showSideNav, setShowSideNav] = useState(false);
