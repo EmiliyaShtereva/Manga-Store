@@ -8,17 +8,28 @@ import HomePageSlider from './slider/HomePageSlider';
 
 export default function HomePage() {
     const [manga, setManga] = useState([]);
+    const [sliderManga, setSliderManga] = useState([]);
     useEffect(() => {
         mangaService.getFive()
             .then(result => setManga(result));
     }, []);
-    console.log(manga)
+
+    const filteredManga = (m) => {
+        if ((m.name == 'Vagabond' || m.name == 'One Punch Man' || m.name == 'Haikyu!!') && m.volume == 'Vol. 1') {
+            return true;
+        }
+    }
+    useEffect(() => {
+        mangaService.getAll()
+            .then(result => setSliderManga(result.filter(filteredManga)));
+    }, []);
+
     
     return (
         <>
             <NavBar />
             <div className={styles['manga-section']}>
-                <HomePageSlider />
+                <HomePageSlider sliderManga={sliderManga} />
                 <h2 className={styles['heading-text']}>Most Liked</h2>
                 <div className={styles['manga-container']}>
                     {manga.map(m => (
