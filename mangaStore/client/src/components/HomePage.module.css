@@ -1,0 +1,20 @@
+.manga-section {
+    background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
+}
+
+.manga-section .manga-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width:fit-content;
+    height:fit-content;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.manga-section .heading-text {
+    color: #4e3369;
+    margin: 2%;
+    font-size: 3vh;
+}
+

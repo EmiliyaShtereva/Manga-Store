@@ -1,7 +1,7 @@
 .card {
    width: 17%;
-   /* height: 70vh; */
    border-radius: 10px;
+   margin-left: 5.5vh;
 }
 
 .card:hover {
