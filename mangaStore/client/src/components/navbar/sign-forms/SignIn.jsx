@@ -58,7 +58,6 @@ export default function SignIn({
                             id="inputEmail"
                             name="email"
                             placeholder="Email"
-                            required=""
                             value={formValues.email}
                             onChange={changeHandler}
                             // onBlur={nameValidator}
@@ -72,7 +71,6 @@ export default function SignIn({
                             id="inputPassword"
                             name="password"
                             placeholder="Password"
-                            required=""
                             value={formValues.password}
                             onChange={changeHandler}
                             // onBlur={nameValidator}

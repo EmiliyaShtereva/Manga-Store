@@ -1,0 +1,24 @@
+.questions-conteiner {
+    padding: 30vh;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+}
+
+.questions-conteiner h1 {
+    text-align: center;
+    color: #4e3369;
+}
+
+.questions-conteiner p {
+    margin-top: 1.5vh;
+    display: inline-block;
+    color: white;
+    font-size: 3vh;
+}
+
+.questions-conteiner .question {
+    font-weight:bold;
+    margin: 0;
+    margin-top: 4vh;
+    color: #4e3369;
+}

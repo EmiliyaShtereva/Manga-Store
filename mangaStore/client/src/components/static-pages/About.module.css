@@ -1,0 +1,30 @@
+.about-conteiner {
+    padding: 20vh;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+}
+
+.about-conteiner h1 {
+    text-align: center;
+    color: #4e3369;
+}
+
+.about-conteiner p {
+    margin-top: 1.5vh;
+    display: inline-block;
+    color: white;
+    font-size: 3vh;
+}
+
+.about-conteiner .shop-name {
+    font-weight:bold;
+    margin: 0;
+    color: #4e3369;
+}
+
+.about-conteiner .different-text {
+    font-weight:bold;
+    margin: 0;
+    margin-top: 4vh;
+    color: #4e3369;
+}

@@ -154,7 +154,6 @@ export default function SignUp({
                             id="inputFirstName"
                             name="firstName"
                             placeholder="First name"
-                            required=""
                             value={formValues.firstName}
                             onChange={changeHandler}
                             onBlur={firstNameValidator}
@@ -169,7 +168,6 @@ export default function SignUp({
                             id="inputLastName"
                             name="lastName"
                             placeholder="Last name"
-                            required=""
                             value={formValues.lastName}
                             onChange={changeHandler}
                             onBlur={lastNameValidator}
@@ -184,7 +182,6 @@ export default function SignUp({
                             id="inputUsername"
                             name="username"
                             placeholder="Username"
-                            required=""
                             value={formValues.username}
                             onChange={changeHandler}
                             onBlur={usernameValidator}
@@ -199,7 +196,6 @@ export default function SignUp({
                             id="inputAddress"
                             name="address"
                             placeholder="Address"
-                            required=""
                             value={formValues.address}
                             onChange={changeHandler}
                             onBlur={addressValidator}
@@ -214,7 +210,6 @@ export default function SignUp({
                             id="inputEmail"
                             name="email"
                             placeholder="Email"
-                            required=""
                             value={formValues.email}
                             onChange={changeHandler}
                             onBlur={emailValidator}
@@ -229,7 +224,6 @@ export default function SignUp({
                             id="inputPassword"
                             name="password"
                             placeholder="Password"
-                            required=""
                             value={formValues.password}
                             onChange={changeHandler}
                             onBlur={passwordValidator}
@@ -240,11 +234,10 @@ export default function SignUp({
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputRepeatPassword">Repeat Password</label>
                         <input
-                            type="repeatPassword"
+                            type="password"
                             id="inputRepeatPassword"
                             name="repeatPassword"
                             placeholder="Repeat Password"
-                            required=""
                             value={formValues.repeatPassword}
                             onChange={changeHandler}
                             onBlur={repeatPasswordValidator}

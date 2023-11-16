@@ -1,0 +1,88 @@
+.contact-conteiner {
+    padding: 20vh;
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+    text-align: center;
+}
+
+.contact-conteiner h1 {
+    text-align: center;
+    color: #4e3369;
+}
+
+.contact-conteiner p {
+    margin-top: 1.5vh;
+    color: white;
+    font-size: 3vh;
+}
+
+.contact-conteiner .shop-name {
+    display: inline-block;
+    font-weight:bold;
+    margin: 0;
+    color: #4e3369;
+}
+
+.contact-conteiner .different-text {
+    font-weight:bold;
+    margin: 0;
+    margin-top: 5vh;
+    color: #4e3369;
+}
+
+
+
+.contact-conteiner .contact-form {
+    margin-top: 10vh;
+    color: white;
+}
+
+.contact-conteiner .contact-form .conteiner {
+    margin: 0 50vh;
+    font-size: 2.5vh;
+}
+
+.contact-conteiner .contact-form input,
+.contact-conteiner .contact-form textarea {
+    width: 100%;
+    font-size: 2vh;
+    font-family: "Open Sans", sans-serif;
+    padding: 12px 20px;
+    margin: 15px 0;
+    display: inline-block;
+    border: 1px solid #4e4d4d;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: #222222;
+    color: white;
+  }
+  
+  .contact-conteiner .contact-form input.input-error {
+    font-size: 2vh;
+    border-color: #6c0505;
+  }
+
+  .contact-conteiner .contact-form .submit-btn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 2.5vh;
+    color: white;
+    background-color: transparent;
+    border: none;
+  }
+  
+  .contact-conteiner .contact-form .submit-btn:hover {
+    color: #b369fe;
+    cursor: pointer;
+  }
+  
+  .contact-conteiner .contact-form .submit-btn:disabled {
+    color: #504f50;
+    cursor: default;
+  }
+
+  .contact-conteiner .contact-form .error-message {
+    margin-top: 0;
+    color: rgb(168, 2, 2);
+    font-size: 2vh;
+  }
