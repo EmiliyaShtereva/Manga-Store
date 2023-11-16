@@ -38,7 +38,8 @@
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-.sidenav button:hover {
+.sidenav button:hover,
+.genre-sidenav button:hover {
     background-color: rgba(0, 0, 0, 0.6);
 }
 
@@ -53,7 +54,7 @@
     z-index: 1;
     top: 0;
     left: 50vh;
-    background-image: linear-gradient(rgba(55, 55, 55, 0.527), rgba(59, 59, 59, 0.8));
+    background-image: linear-gradient(rgba(99, 98, 98, 0.527), rgba(95, 94, 94, 0.8));
     background-size: cover;
     background-repeat: no-repeat;
 }

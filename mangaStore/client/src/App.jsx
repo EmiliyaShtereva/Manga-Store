@@ -15,7 +15,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/genre/:genre" element={<MangaListGenre />} />
         <Route path="/newest" element='' />
-        <Route path="/status/:status" element={<MangaListStatus />} />
+        {/* <Route path="/status/:status" element={<MangaListStatus />} /> */}
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/questions" element={<FAQ />} />

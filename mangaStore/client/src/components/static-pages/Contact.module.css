@@ -8,6 +8,7 @@
 .contact-conteiner h1 {
     text-align: center;
     color: #4e3369;
+    font-size: 6vh;
 }
 
 .contact-conteiner p {
@@ -55,11 +56,6 @@
     border-radius: 8px;
     background-color: #222222;
     color: white;
-  }
-  
-  .contact-conteiner .contact-form input.input-error {
-    font-size: 2vh;
-    border-color: #6c0505;
   }
 
   .contact-conteiner .contact-form .submit-btn {

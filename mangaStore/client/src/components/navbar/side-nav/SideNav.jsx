@@ -21,8 +21,8 @@ export default function SideNav({ onClose }) {
                 <button onClick={() => navigate('/home')}>Home</button>
                 <button onClick={onGenreClick} className={!showGenres ? '' : styles['active']}>Genre</button>
                 <button onClick={() => navigate('/newest')}>Newest</button>
-                <button onClick={() => navigate('/status/ongoing')}>Ongoin</button>
-                <button onClick={() => navigate('/status/completed')}>Completed</button>
+                {/* <button onClick={() => navigate('/status/ongoing')}>Ongoin</button>
+                <button onClick={() => navigate('/status/completed')}>Completed</button> */}
                 <button onClick={() => navigate('/about')}>About</button>
                 <button onClick={() => navigate('/contact')}>Contact</button>
                 <button onClick={() => navigate('/questions')}>FAQ</button>
@@ -30,6 +30,7 @@ export default function SideNav({ onClose }) {
 
             {showGenres && (
                 <div className={styles['genre-sidenav']}>
+                    <button onClick={() => navigate('/genre/all')}>All</button>
                     <button onClick={() => navigate('/genre/action')}>Action</button>
                     <button onClick={() => navigate('/genre/horror')}>Horror</button>
                     <button onClick={() => navigate('/genre/comedy')}>Comedy</button>
