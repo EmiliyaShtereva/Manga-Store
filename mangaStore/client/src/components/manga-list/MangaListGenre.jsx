@@ -19,6 +19,11 @@ export default function MangaListGenre() {
     const [formValues, setFormValues] = useState(formInitialstate);
 
     useEffect(() => {
+        setFormValues(state => ({
+            ...state,
+            genre: genre,
+        }));
+
         if (genre == 'all') {
             if (formValues.status == 'all') {
                 mangaService.getAll()
