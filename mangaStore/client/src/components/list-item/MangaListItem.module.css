@@ -1,6 +1,6 @@
 .card {
    width: 17%;
-   border-radius: 10px;
+   border-radius: 2vh;
    margin: 3vh;
 }
 
@@ -20,7 +20,7 @@
    width: 100%;
    height: 100%;
    object-fit: cover;
-   border-radius: 10px;
+   border-radius: 2vh;
    transform: scale(1);
 }
 

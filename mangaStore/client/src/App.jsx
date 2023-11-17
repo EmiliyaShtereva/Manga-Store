@@ -6,6 +6,7 @@ import MangaListStatus from "./components/manga-list/MangaListStatus.jsx";
 import About from "./components/static-pages/About.jsx";
 import FAQ from "./components/static-pages/FAQ.jsx";
 import Contact from "./components/static-pages/Contact.jsx";
+import MangaDetails from "./components/manga-details/MangaDetails.jsx";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/questions" element={<FAQ />} />
-        <Route path="/details/:mangaId" element='' />
+        <Route path="/details/:mangaId" element={<MangaDetails />} />
         <Route path="/cart" element='' />
         <Route path="/liked" element='' />
       </Routes>

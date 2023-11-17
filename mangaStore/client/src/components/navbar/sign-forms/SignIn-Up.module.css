@@ -21,7 +21,7 @@
   width: 50vh;
   position: absolute;
   margin: auto;
-  border-radius: 20px;
+  border-radius: 3vh;
   background-color: black;
   color: white;
   padding: 1rem;
@@ -34,7 +34,7 @@
   .modal {
     width: 70vh;
     left: calc(50% - 30vh);
-    border-radius: 14px;
+    border-radius: 2.5vh;
   }
 }
 
@@ -60,7 +60,7 @@
   display: inline-block;
   border: 1px solid #4e4d4d;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 2vh;
   background-color: #222222;
   color: white;
 }
