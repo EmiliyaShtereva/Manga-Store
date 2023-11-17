@@ -29,7 +29,7 @@ export default function SideNav({ onClose }) {
             </div>
 
             {showGenres && (
-                <div className={styles['genre-sidenav']}>
+                <div className={styles['genre-sidenav']} onClick={onClose}>
                     <button onClick={() => navigate('/genre/all')}>All</button>
                     <button onClick={() => navigate('/genre/action')}>Action</button>
                     <button onClick={() => navigate('/genre/horror')}>Horror</button>
