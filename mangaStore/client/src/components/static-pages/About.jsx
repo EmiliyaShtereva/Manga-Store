@@ -14,8 +14,6 @@ export default function About() {
                 <div className={styles['set-apart']}>
                 <p className={styles['different-text']}>Diverse Collection:</p>
                 <p>Immerse yourself in a vast array of manga genres, from action-packed shonen and heartwarming shojo to mind-bending seinen and thought-provoking josei. Our collection spans the entire manga spectrum, catering to all tastes and preferences.</p>
-                <p className={styles['different-text']}>Digital Delights:</p>
-                <p>Embrace the convenience of digital manga with our user-friendly platform. Browse, purchase, and enjoy your favorite titles from the comfort of your device, anytime, anywhere. Our digital library ensures that your manga adventures are just a click away.</p>
                 <p className={styles['different-text']}>Latest Releases: </p>
                 <p>Stay ahead of the curve with our commitment to bringing you the latest manga releases hot off the presses. Explore new series, catch up on ongoing favorites, and be the first to discover hidden gems that will soon become must-reads.</p>
                 <p className={styles['different-text']}>Exclusive Offers: </p>

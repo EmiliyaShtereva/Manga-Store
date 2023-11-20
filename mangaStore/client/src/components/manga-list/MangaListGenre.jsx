@@ -48,24 +48,7 @@ export default function MangaListGenre() {
                     ));
             }
         }
-    }, [genre]);
-
-    useEffect(() => {
-        if (formValues.status == 'all') {
-            mangaService.getAll()
-                .then(result => setManga(
-                    result
-                        .filter(m => m?.genre.toLowerCase().includes(genre))
-                ));
-        } else {
-            mangaService.getAll()
-                .then(result => setManga(
-                    result
-                        .filter(m => m?.genre.toLowerCase().includes(genre))
-                        .filter(m => m.status.toLowerCase().includes(formValues.status))
-                ));
-        }
-    }, [formValues.status]);
+    }, [genre, formValues.status]);
 
     const changeHandler = (e) => {
         setFormValues(state => ({

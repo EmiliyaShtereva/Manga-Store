@@ -48,7 +48,7 @@ export default function MangaDetails() {
                         </div>
                         <p className={styles['price']}>{manga.price}</p>
                         <div className={styles['buttons']}>
-                            <input type="number" value={1} />
+                            <input type="number" defaultValue={1} />
                             <button className={styles['cart']}><i className="fa fa-cart-shopping"></i> Add to cart</button>
                             <button className={styles['like']}><i className="fa fa-heart"></i> Add to liked</button>
                         </div>

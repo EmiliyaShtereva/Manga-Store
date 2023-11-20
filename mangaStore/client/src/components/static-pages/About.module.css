@@ -2,6 +2,7 @@
     padding: 20vh;
     padding-top: 10vh;
     padding-bottom: 10vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
 }
 
 .about-conteiner h1 {

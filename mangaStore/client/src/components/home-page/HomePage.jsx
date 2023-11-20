@@ -24,7 +24,7 @@ export default function HomePage() {
             .then(result => setSliderManga(result.filter(filteredManga)));
     }, []);
 
-    
+
     return (
         <>
             <NavBar />
@@ -35,19 +35,19 @@ export default function HomePage() {
                     {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />
                     ))}
-            </div>
+                </div>
                 <h2 className={styles['heading-text']}>Most Recent</h2>
                 <div className={styles['manga-container']}>
-                {manga.map(m => (
+                    {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />
                     ))}
-            </div>
+                </div>
                 <h2 className={styles['heading-text']}>Coming Soon</h2>
                 <div className={styles['manga-container']}>
-                {manga.map(m => (
+                    {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />
                     ))}
-            </div>
+                </div>
             </div>
             <Footer />
         </>
