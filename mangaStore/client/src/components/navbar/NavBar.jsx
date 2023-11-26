@@ -1,31 +1,17 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import styles from './NavBar.module.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SideNav from './side-nav/SideNav';
-import SignIn from './sign-forms/SignIn';
-import SignUp from './sign-forms/SignUp';
+import SignIn from '../sign-forms/SignIn';
+import SignUp from '../sign-forms/SignUp';
+import AuthContext from '../../context/authContext';
 
 export default function NavBar() {
+    const { isAuthenticated } = useContext(AuthContext);
     const [showSideNav, setShowSideNav] = useState(false);
-    const [showSignIn, setShowSignIn] = useState(false);
-    const [showSignUp, setShowSignUp] = useState(false);
 
     const navClickHandler = () => {
         setShowSideNav(true);
-    }
-
-    const signInClickHandler = () => {
-        setShowSignIn(true);
-    }
-
-    const onSignUpCLick = () => {
-        setShowSignIn(false);
-        setShowSignUp(true);
-    }
-
-    const onSignInCLick = () => {
-        setShowSignIn(true);
-        setShowSignUp(false);
     }
 
     return (
@@ -44,20 +30,21 @@ export default function NavBar() {
                         <img src="/images/logo3.png" alt="logo" />
                     </Link>
                 </div>
-                {/* for guests */}
-                <button className={styles['right']} onClick={signInClickHandler}>Sign In</button>
-                {/*for logged users */}
-                {/* <div className={styles['right']}><a href="">Logout</a></div>
-            <div className={styles['right']}><a href=""><i className="fa fa-heart"></i></a></div>
-            <div className={styles['right']}><a href=""><i className="fa fa-cart-shopping"></i></a></div> */}
+                {!isAuthenticated
+                    && (
+                        <div className={styles['right']}> <Link to="/sign-in">Sign In</Link></div>
+                    )}
+                {isAuthenticated
+                    && (
+                        <>
+                            <div className={styles['right']}><Link to="/logout">Logout</Link></div>
+                            <div className={styles['right']}><Link to="/cart"><i className="fa fa-cart-shopping"></i></Link></div>
+                            <div className={styles['right']}><Link to="/liked"><i className="fa fa-heart"></i></Link></div>
+                        </>
+                    )}
             </nav>
 
             {showSideNav && <SideNav onClose={() => setShowSideNav(false)} />}
-
-            {showSignIn && <SignIn onClose={() => setShowSignIn(false)} onSignUp={onSignUpCLick} />}
-
-            {showSignUp && <SignUp onClose={() => setShowSignUp(false)} onSignIn={onSignInCLick} />}
-
         </>
     )
 }

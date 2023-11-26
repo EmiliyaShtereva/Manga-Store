@@ -1,5 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './SignIn-Up.module.css';
+import AuthContext from '../../context/authContext';
+import useForm from '../../hooks/useForm';
+import { Link } from 'react-router-dom';
+import Footer from '../footer/Footer';
+import NavBar from '../navbar/NavBar';
 
 const formInitialstate = {
     firstName: '',
@@ -11,39 +16,30 @@ const formInitialstate = {
     repeatPassword: '',
 }
 
-export default function SignUp({
-    onClose,
-    onSignIn
-}) {
+export default function SignUp() {
     const nameInputRef = useRef();
-    const [formValues, setFormValues] = useState(formInitialstate);
+    const { signUpSubmitHandler } = useContext(AuthContext);
+    const { values, onChange, onSubmit } = useForm(signUpSubmitHandler, formInitialstate);
     const [errors, setErrors] = useState({});
 
-    const changeHandler = (e) => {
-        setFormValues(state => ({
-            ...state,
-            [e.target.name]: e.target.value,
-        }));
-    };
-
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const filteredValues = Object.values(formValues).filter(value => value.length == 0);
-        if (filteredValues.length > 0) {
-            setErrors(state => ({
-                ...state,
-                emptySpaces: 'All spaces should be filled'
-            }))
-        } else {
-            if (errors.emptySpaces) {
-                setErrors(state => ({ ...state, emptySpaces: '' }));
-            }
-            setFormValues(formInitialstate);
-        }
-    }
+    // const submitHandler = (e) => {
+    //     e.preventDefault();
+    //     const filteredValues = Object.values(values).filter(value => value.length == 0);
+    //     if (filteredValues.length > 0) {
+    //         setErrors(state => ({
+    //             ...state,
+    //             emptySpaces: 'All spaces should be filled'
+    //         }))
+    //     } else {
+    //         if (errors.emptySpaces) {
+    //             setErrors(state => ({ ...state, emptySpaces: '' }));
+    //         }
+    //         setvalues(formInitialstate);
+    //     }
+    // }
 
     const firstNameValidator = () => {
-        if (formValues.firstName.length < 1) {
+        if (values.firstName.length < 1) {
             setErrors(state => ({
                 ...state,
                 firstName: 'First name should have at least 1 character'
@@ -56,7 +52,7 @@ export default function SignUp({
     }
 
     const lastNameValidator = () => {
-        if (formValues.lastName.length < 1) {
+        if (values.lastName.length < 1) {
             setErrors(state => ({
                 ...state,
                 lastName: 'Last name should have at least 1 character'
@@ -69,7 +65,7 @@ export default function SignUp({
     }
 
     const usernameValidator = () => {
-        if (formValues.username.length < 1) {
+        if (values.username.length < 1) {
             setErrors(state => ({
                 ...state,
                 username: 'Username should have at least 1 character'
@@ -82,7 +78,7 @@ export default function SignUp({
     }
 
     const addressValidator = () => {
-        if (formValues.address.length < 5) {
+        if (values.address.length < 5) {
             setErrors(state => ({
                 ...state,
                 address: 'Address should be at least 5 characters'
@@ -95,7 +91,7 @@ export default function SignUp({
     }
 
     const emailValidator = () => {
-        if (formValues.email.length < 10) {
+        if (values.email.length < 10) {
             setErrors(state => ({
                 ...state,
                 email: 'Email should be at least 10 characters'
@@ -108,7 +104,7 @@ export default function SignUp({
     }
 
     const passwordValidator = () => {
-        if (formValues.password.length < 5) {
+        if (values.password.length < 5) {
             setErrors(state => ({
                 ...state,
                 password: 'Password should be at least 5 characters'
@@ -121,7 +117,7 @@ export default function SignUp({
     }
 
     const repeatPasswordValidator = () => {
-        if (formValues.password !== formValues.repeatPassword) {
+        if (values.password !== values.repeatPassword) {
             setErrors(state => ({
                 ...state,
                 repeatPassword: 'Password and Repeat Password should be the same'
@@ -138,14 +134,13 @@ export default function SignUp({
     }, []);
 
     return (
-        <div className={styles['overlay']}>
-            <div className={styles['backdrop']} onClick={onClose}></div>
+        <>
+            <NavBar />
             <div className={styles['modal']}>
-                <form className={styles['form']} onSubmit={submitHandler}>
+                <form className={styles['form']} onSubmit={onSubmit}>
                     <div className={styles['conteiner']}>
                         <h1>Sign Up</h1>
                     </div>
-                    <button className={styles['close-btn']} type="button" onClick={onClose}><i className="fa fa-xmark"></i></button>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputFirstName">First name</label>
                         <input
@@ -154,8 +149,8 @@ export default function SignUp({
                             id="inputFirstName"
                             name="firstName"
                             placeholder="First name"
-                            value={formValues.firstName}
-                            onChange={changeHandler}
+                            value={values.firstName}
+                            onChange={onChange}
                             onBlur={firstNameValidator}
                             className={errors.firstName && styles['input-error']}
                         />
@@ -168,8 +163,8 @@ export default function SignUp({
                             id="inputLastName"
                             name="lastName"
                             placeholder="Last name"
-                            value={formValues.lastName}
-                            onChange={changeHandler}
+                            value={values.lastName}
+                            onChange={onChange}
                             onBlur={lastNameValidator}
                             className={errors.lastName && styles['input-error']}
                         />
@@ -182,8 +177,8 @@ export default function SignUp({
                             id="inputUsername"
                             name="username"
                             placeholder="Username"
-                            value={formValues.username}
-                            onChange={changeHandler}
+                            value={values.username}
+                            onChange={onChange}
                             onBlur={usernameValidator}
                             className={errors.username && styles['input-error']}
                         />
@@ -196,8 +191,8 @@ export default function SignUp({
                             id="inputAddress"
                             name="address"
                             placeholder="Address"
-                            value={formValues.address}
-                            onChange={changeHandler}
+                            value={values.address}
+                            onChange={onChange}
                             onBlur={addressValidator}
                             className={errors.address && styles['input-error']}
                         />
@@ -210,8 +205,8 @@ export default function SignUp({
                             id="inputEmail"
                             name="email"
                             placeholder="Email"
-                            value={formValues.email}
-                            onChange={changeHandler}
+                            value={values.email}
+                            onChange={onChange}
                             onBlur={emailValidator}
                             className={errors.email && styles['input-error']}
                         />
@@ -224,8 +219,8 @@ export default function SignUp({
                             id="inputPassword"
                             name="password"
                             placeholder="Password"
-                            value={formValues.password}
-                            onChange={changeHandler}
+                            value={values.password}
+                            onChange={onChange}
                             onBlur={passwordValidator}
                             className={errors.password && styles['input-error']}
                         />
@@ -238,8 +233,8 @@ export default function SignUp({
                             id="inputRepeatPassword"
                             name="repeatPassword"
                             placeholder="Repeat Password"
-                            value={formValues.repeatPassword}
-                            onChange={changeHandler}
+                            value={values.repeatPassword}
+                            onChange={onChange}
                             onBlur={repeatPasswordValidator}
                             className={errors.repeatPassword && styles['input-error']}
                         />
@@ -252,10 +247,11 @@ export default function SignUp({
                     >
                         Sign Up
                     </button>
-                    <p className={styles['error-message']}>{errors.emptySpaces}</p>
-                    <p className={styles['acount-text']}>Already have an account? Then just <button className={styles['forms-btn']} type="button" onClick={onSignIn}>Sign In</button>!</p>
+                    {/* <p className={styles['error-message']}>{errors.emptySpaces}</p> */}
+                    <p className={styles['acount-text']}>Already have an account? Then just <Link to="/sign-in" className={styles['forms-btn']}>Sign In</Link>!</p>
                 </form>
             </div>
-        </div>
+            <Footer />
+        </>
     )
 }

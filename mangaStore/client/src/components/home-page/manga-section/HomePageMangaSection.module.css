@@ -1,9 +1,0 @@
-.manga-container {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    width:fit-content;
-    height:fit-content;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
