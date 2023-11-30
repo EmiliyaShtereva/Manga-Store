@@ -23,7 +23,7 @@ export default function SignIn() {
     }, []);
 
     const emailValidator = () => {
-        if (values.email.length < 10) {
+        if (values.email.length < 1) {
             setErrors(state => ({
                 ...state,
                 email: 'This field is mandatory'
@@ -36,7 +36,7 @@ export default function SignIn() {
     }
 
     const passwordValidator = () => {
-        if (values.password.length < 5) {
+        if (values.password.length < 1) {
             setErrors(state => ({
                 ...state,
                 password: 'This field is mandatory'

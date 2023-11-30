@@ -6,25 +6,24 @@ import MangaListItem from "../list-item/MangaListItem";
 import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
 
-export default function MangaListGenre() {
+export default function MangaList() {
     const navigate = useNavigate();
-    const { genre } = useParams();
+    // const { genre } = useParams();
     const [manga, setManga] = useState([]);
 
     let formInitialstate = {
-        genre: genre,
+        genre: 'all',
         status: 'all'
     }
 
     const [formValues, setFormValues] = useState(formInitialstate);
 
     useEffect(() => {
-        setFormValues(state => ({
-            ...state,
-            genre: genre,
-        }));
+        // setFormValues(state => ({
+        //     ...state,
+        // }));
 
-        if (genre == 'all') {
+        if (formValues.genre == 'all') {
             if (formValues.status == 'all') {
                 mangaService.getAll()
                     .then(result => setManga(result));
@@ -48,7 +47,7 @@ export default function MangaListGenre() {
                     ));
             }
         }
-    }, [genre, formValues.status]);
+    }, [formValues.genre, formValues.status]);
 
     const changeHandler = (e) => {
         setFormValues(state => ({
@@ -56,16 +55,16 @@ export default function MangaListGenre() {
             [e.target.name]: e.target.value,
         }));
 
-        if (e.target.name == 'genre') {
-            navigate(`/genre/${e.target.value}`);
-        }
+        // if (e.target.name == 'genre') {
+        //     navigate(`/genre/${e.target.value}`);
+        // }
     };
 
     return (
         <>
             <NavBar />
             <div className={styles['manga-list']}>
-                <h1 className={styles['heading-text']}>{genre[0].toUpperCase() + genre.slice(1)}</h1>
+                <h1 className={styles['heading-text']}>{formValues.genre}</h1>
                 <div className={styles['selector']}>
                     <label htmlFor="genre">Genre:</label>
                     <select name="genre" id="genre" onChange={changeHandler} value={formValues.genre}>

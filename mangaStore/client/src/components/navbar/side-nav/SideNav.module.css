@@ -47,18 +47,6 @@
     background-color: rgba(0, 0, 0, 0.6);
 }
 
-.genre-sidenav {
-    height: fit-content;
-    width: 50vh;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 50vh;
-    background-image: linear-gradient(rgba(99, 98, 98, 0.527), rgba(95, 94, 94, 0.8));
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
 @media screen and (max-height: 450px) {
     .sidenav {
         padding-top: 15px;

@@ -19,24 +19,13 @@ export default function SideNav({ onClose }) {
             <div className={styles['sidenav-backdrop']} onClick={onClose}></div>
             <div className={styles['sidenav']}>
                 <button onClick={() => navigate('/')}>Home</button>
-                <button onClick={onGenreClick} className={!showGenres ? '' : styles['active']}>Genre</button>
+                <button onClick={() => navigate('/catalog')}>Catalog</button>
                 <button onClick={() => navigate('/newest')}>Newest</button>
+                <button onClick={() => navigate('/create')}>Create</button>
                 <button onClick={() => navigate('/about')}>About</button>
                 <button onClick={() => navigate('/contact')}>Contact</button>
                 <button onClick={() => navigate('/questions')}>FAQ</button>
             </div>
-
-            {showGenres && (
-                <div className={styles['genre-sidenav']} onClick={onClose}>
-                    <button onClick={() => navigate('/genre/all')}>All</button>
-                    <button onClick={() => navigate('/genre/action')}>Action</button>
-                    <button onClick={() => navigate('/genre/horror')}>Horror</button>
-                    <button onClick={() => navigate('/genre/comedy')}>Comedy</button>
-                    <button onClick={() => navigate('/genre/romance')}>Romance</button>
-                    <button onClick={() => navigate('/genre/mystery')}>Mystery</button>
-                    <button onClick={() => navigate('/genre/sports')}>Sports</button>
-                </div>
-            )}
         </div>
     )
 }
