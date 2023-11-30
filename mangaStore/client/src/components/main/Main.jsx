@@ -5,7 +5,7 @@ export default function Main() {
     const navigate = useNavigate();
 
     const onFullSiteClick = () => {
-        navigate('/home');
+        navigate('/');
     }
 
     return (
@@ -18,7 +18,6 @@ export default function Main() {
                 <h1>Manga Heaven</h1>
                 <p>Your number one place for manga</p>
             </div>
-            <button className={styles['full-site']} onClick={onFullSiteClick}>Full site</button>
         </div>
     )
 }

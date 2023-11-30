@@ -18,7 +18,7 @@ export default function SideNav({ onClose }) {
         <div className={styles['sidenav-overlay']}>
             <div className={styles['sidenav-backdrop']} onClick={onClose}></div>
             <div className={styles['sidenav']}>
-                <button onClick={() => navigate('/home')}>Home</button>
+                <button onClick={() => navigate('/')}>Home</button>
                 <button onClick={onGenreClick} className={!showGenres ? '' : styles['active']}>Genre</button>
                 <button onClick={() => navigate('/newest')}>Newest</button>
                 <button onClick={() => navigate('/about')}>About</button>

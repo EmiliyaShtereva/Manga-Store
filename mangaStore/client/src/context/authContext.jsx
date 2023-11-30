@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             setErrorMessage('');
             setAuth(result);
-            navigate('/home');
+            navigate('/');
         }
     }
 
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             setErrorMessage('');
             setAuth(result);
-            navigate('/home');
+            navigate('/');
         }
     }
 

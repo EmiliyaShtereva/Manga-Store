@@ -35,7 +35,7 @@ export default function Contact() {
                 setErrors(state => ({ ...state, emptySpaces: '' }));
             }
             setFormValues(formInitialstate);
-            navigate('/home');
+            navigate('/');
         }
     }
 

@@ -24,7 +24,7 @@ export default function NavBar() {
                     </form>
                 </div>
                 <div className={styles['site-logo']}>
-                    <Link to="/home">
+                    <Link to="/">
                         <img src="/images/logo3.png" alt="logo" />
                     </Link>
                 </div>

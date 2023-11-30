@@ -13,7 +13,7 @@ export const getFive = async () => {
         method: 'GET',
     });
     const result = await response.json();
-    return Object.values(result).slice(-5);
+    return Object.values(result).slice(-15);
 }
 
 export const getOne = async (mangaId) => {

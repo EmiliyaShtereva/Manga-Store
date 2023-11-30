@@ -11,11 +11,11 @@ export default function Logout() {
         authService.logout()
             .then(() => {
                 logoutHandler();
-                navigate('/home');
+                navigate('/');
             })
             .catch(() => {
                 logoutHandler();
-                navigate('/home');
+                navigate('/');
             });
     }, []);
 

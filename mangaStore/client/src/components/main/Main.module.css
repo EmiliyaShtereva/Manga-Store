@@ -1,5 +1,6 @@
 .hero-conteiner {
-    height: 100vh;
+    height: 75vh;
+    margin-top: 10vh;
     background-image: linear-gradient(to bottom,
             black,
             rgba(0, 0, 0, 0.5)), url('/images/mangaPanels.jpg');

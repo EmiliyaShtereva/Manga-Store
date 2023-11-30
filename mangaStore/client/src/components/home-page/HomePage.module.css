@@ -4,6 +4,8 @@
 
 .manga-section .manga-container {
     display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
     background-size: cover;
     background-repeat: no-repeat;
 }

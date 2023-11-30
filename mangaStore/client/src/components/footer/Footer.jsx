@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <div className={styles['footer']}>
             <div className={styles['site-logo']}>
-                <Link to="/home">
+                <Link to="/">
                     <img src="/images/logo3.png" alt="logo" />
                 </Link>
                 <p>&copy; 2023 Manga Heaven</p>
