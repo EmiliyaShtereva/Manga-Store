@@ -21,8 +21,6 @@ export default function SideNav({ onClose }) {
                 <button onClick={() => navigate('/home')}>Home</button>
                 <button onClick={onGenreClick} className={!showGenres ? '' : styles['active']}>Genre</button>
                 <button onClick={() => navigate('/newest')}>Newest</button>
-                {/* <button onClick={() => navigate('/status/ongoing')}>Ongoin</button>
-                <button onClick={() => navigate('/status/completed')}>Completed</button> */}
                 <button onClick={() => navigate('/about')}>About</button>
                 <button onClick={() => navigate('/contact')}>Contact</button>
                 <button onClick={() => navigate('/questions')}>FAQ</button>

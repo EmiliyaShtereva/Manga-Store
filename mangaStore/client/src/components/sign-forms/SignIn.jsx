@@ -14,77 +14,87 @@ const formInitialstate = {
 export default function SignIn() {
     const emailInputRef = useRef();
     const { signInSubmitHandler } = useContext(AuthContext);
+    const { errorMessage } = useContext(AuthContext);
     const { values, onChange, onSubmit } = useForm(signInSubmitHandler, formInitialstate);
-    // const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         emailInputRef.current.focus();
     }, []);
 
+    const emailValidator = () => {
+        if (values.email.length < 10) {
+            setErrors(state => ({
+                ...state,
+                email: 'This field is mandatory'
+            }));
+        } else {
+            if (errors.email) {
+                setErrors(state => ({ ...state, email: '' }));
+            }
+        }
+    }
 
-    // const submitHandler = (e) => {
-    //     e.preventDefault();
-    //     const filteredValues = Object.values(formValues).filter(value => value.length == 0);
-    //     if (filteredValues.length > 0) {
-    //         setErrors(state => ({
-    //             ...state,
-    //             emptySpaces: 'All spaces should be filled'
-    //         }))
-    //     } else {
-    //         if (errors.emptySpaces) {
-    //             setErrors(state => ({ ...state, emptySpaces: '' }));
-    //         }
-    //         setFormValues(formInitialstate);
-    //     }
-    // }
+    const passwordValidator = () => {
+        if (values.password.length < 5) {
+            setErrors(state => ({
+                ...state,
+                password: 'This field is mandatory'
+            }));
+        } else {
+            if (errors.password) {
+                setErrors(state => ({ ...state, password: '' }));
+            }
+        }
+    }
 
     return (
         <>
-        <NavBar />
-        <div className={styles['modal']}>
-            <form className={styles['form']} onSubmit={onSubmit}>
-                <div className={styles['conteiner']}>
-                    <h1 className={styles['title']}>Sign In</h1>
-                </div>
-                <div className={styles['conteiner']}>
-                    <label htmlFor="inputEmail">Email</label>
-                    <input
-                        ref={emailInputRef}
-                        type="text"
-                        id="inputEmail"
-                        name="email"
-                        placeholder="Email"
-                        value={values.email}
-                        onChange={onChange}
-                    // onBlur={nameValidator}
-                    // className={errors.email && styles['input-error']}
-                    />
-                </div>
-                <div className={styles['conteiner']}>
-                    <label htmlFor="inputPassword">Password</label>
-                    <input
-                        type="password"
-                        id="inputPassword"
-                        name="password"
-                        placeholder="Password"
-                        value={values.password}
-                        onChange={onChange}
-                    // onBlur={nameValidator}
-                    // className={errors.password && styles['input-error']}
-                    />
-                </div>
-                <button
-                    className={styles['submit-btn']}
-                    type="submit"
-                // disabled={Object.values(errors).some(x => x)}
-                >
-                    Sign In
-                </button>
-                {/* <p className={styles['error-message']}>{errors.emptySpaces}</p> */}
-                <p className={styles['acount-text']}> Don't have an account? Then just <Link to="/sign-up" className={styles['forms-btn']}>Sign Up</Link>!</p>
-            </form>
-        </div>
-        <Footer />
+            <NavBar />
+            <div className={styles['modal']}>
+                <form className={styles['form']} onSubmit={onSubmit}>
+                    <div className={styles['conteiner']}>
+                        <h1 className={styles['title']}>Sign In</h1>
+                    </div>
+                    <div className={styles['conteiner']}>
+                        <label htmlFor="inputEmail">Email</label>
+                        <input
+                            ref={emailInputRef}
+                            type="text"
+                            id="inputEmail"
+                            name="email"
+                            placeholder="Email"
+                            value={values.email}
+                            onChange={onChange}
+                            onBlur={emailValidator}
+                            className={errors.email && styles['input-error']}
+                        />
+                    </div>
+                    <div className={styles['conteiner']}>
+                        <label htmlFor="inputPassword">Password</label>
+                        <input
+                            type="password"
+                            id="inputPassword"
+                            name="password"
+                            placeholder="Password"
+                            value={values.password}
+                            onChange={onChange}
+                            onBlur={passwordValidator}
+                            className={errors.password && styles['input-error']}
+                        />
+                    </div>
+                    <button
+                        className={styles['submit-btn']}
+                        type="submit"
+                        disabled={Object.values(errors).some(x => x)}
+                    >
+                        Sign In
+                    </button>
+                    {errorMessage && <p className={styles['error-message']}>{errorMessage}</p>}
+                    <p className={styles['acount-text']}> Don't have an account? Then just <Link to="/sign-up" className={styles['forms-btn']}>Sign Up</Link>!</p>
+                </form>
+            </div>
+            <Footer />
         </>
     )
 }

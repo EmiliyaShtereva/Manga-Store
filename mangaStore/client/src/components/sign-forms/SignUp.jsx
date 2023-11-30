@@ -19,24 +19,13 @@ const formInitialstate = {
 export default function SignUp() {
     const nameInputRef = useRef();
     const { signUpSubmitHandler } = useContext(AuthContext);
+    const { errorMessage } = useContext(AuthContext);
     const { values, onChange, onSubmit } = useForm(signUpSubmitHandler, formInitialstate);
     const [errors, setErrors] = useState({});
 
-    // const submitHandler = (e) => {
-    //     e.preventDefault();
-    //     const filteredValues = Object.values(values).filter(value => value.length == 0);
-    //     if (filteredValues.length > 0) {
-    //         setErrors(state => ({
-    //             ...state,
-    //             emptySpaces: 'All spaces should be filled'
-    //         }))
-    //     } else {
-    //         if (errors.emptySpaces) {
-    //             setErrors(state => ({ ...state, emptySpaces: '' }));
-    //         }
-    //         setvalues(formInitialstate);
-    //     }
-    // }
+    useEffect(() => {
+        nameInputRef.current.focus();
+    }, []);
 
     const firstNameValidator = () => {
         if (values.firstName.length < 1) {
@@ -128,10 +117,6 @@ export default function SignUp() {
             }
         }
     }
-
-    useEffect(() => {
-        nameInputRef.current.focus();
-    }, []);
 
     return (
         <>
@@ -247,7 +232,7 @@ export default function SignUp() {
                     >
                         Sign Up
                     </button>
-                    {/* <p className={styles['error-message']}>{errors.emptySpaces}</p> */}
+                    {errorMessage && <p className={styles['error-message']}>{errorMessage}</p>}
                     <p className={styles['acount-text']}>Already have an account? Then just <Link to="/sign-in" className={styles['forms-btn']}>Sign In</Link>!</p>
                 </form>
             </div>

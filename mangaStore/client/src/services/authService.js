@@ -20,8 +20,7 @@ export const register = async (data) => {
             'content-type': 'application/json'
         },
         body: JSON.stringify(data)
-
-    });
+    })
     const result = await response.json();
     return result;
 }

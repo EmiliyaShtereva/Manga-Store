@@ -13,7 +13,10 @@ export default function Logout() {
                 logoutHandler();
                 navigate('/home');
             })
-            .catch(() => navigate('/home'));
+            .catch(() => {
+                logoutHandler();
+                navigate('/home');
+            });
     }, []);
 
     return null;

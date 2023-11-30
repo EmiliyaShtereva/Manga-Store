@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import styles from './NavBar.module.css'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import SideNav from './side-nav/SideNav';
-import SignIn from '../sign-forms/SignIn';
-import SignUp from '../sign-forms/SignUp';
 import AuthContext from '../../context/authContext';
 
 export default function NavBar() {
