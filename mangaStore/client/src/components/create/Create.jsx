@@ -3,6 +3,8 @@ import styles from './Create.module.css';
 import useForm from '../../hooks/useForm';
 import Footer from '../footer/Footer';
 import NavBar from '../navbar/NavBar';
+import * as mangaService from '../../services/mangaService'
+import { useNavigate } from 'react-router-dom';
 
 const formInitialstate = {
     name: '',
@@ -10,25 +12,33 @@ const formInitialstate = {
     imageUrl: '',
     price: '',
     volume: '',
-    genre: '',
-    status: '',
+    genre: 'action',
+    status: 'ongoing',
     pages: '',
     language: '',
     synopsis: '',
 }
 
-const createSubmitHandler = () => {
-    console.log('created');
-}
-
 export default function Create() {
+    const navigate = useNavigate();
     const nameInputRef = useRef();
-    const { values, onChange, onSubmit } = useForm(createSubmitHandler, formInitialstate);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
         nameInputRef.current.focus();
     }, []);
+
+    const createSubmitHandler = async (values) => {
+        try {
+            await mangaService.create(values);
+            navigate('/');
+        } catch (err) {
+            //Error notification
+            console.log(err);
+        }
+    }
+
+    const { values, onChange, onSubmit } = useForm(createSubmitHandler, formInitialstate);
 
     const nameValidator = () => {
         if (values.name.length < 1) {
@@ -70,10 +80,10 @@ export default function Create() {
     }
 
     const priceValidator = () => {
-        if (values.price.length < 1) {
+        if (values.price <= 0) {
             setErrors(state => ({
                 ...state,
-                price: 'This field is mandatory'
+                price: 'Price should be more than 0'
             }));
         } else {
             if (errors.price) {
@@ -82,37 +92,11 @@ export default function Create() {
         }
     }
 
-    const genreValidator = () => {
-        if (values.genre.length < 1) {
-            setErrors(state => ({
-                ...state,
-                genre: 'This field is mandatory'
-            }));
-        } else {
-            if (errors.genre) {
-                setErrors(state => ({ ...state, genre: '' }));
-            }
-        }
-    }
-
-    const statusValidator = () => {
-        if (values.status.length < 1) {
-            setErrors(state => ({
-                ...state,
-                status: 'This field is mandatory'
-            }));
-        } else {
-            if (errors.status) {
-                setErrors(state => ({ ...state, status: '' }));
-            }
-        }
-    }
-
     const pagesValidator = () => {
-        if (values.pages.length < 1) {
+        if (values.pages <= 0) {
             setErrors(state => ({
                 ...state,
-                pages: 'This field is mandatory'
+                pages: 'Pages should be more than 0'
             }));
         } else {
             if (errors.pages) {
@@ -201,7 +185,7 @@ export default function Create() {
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputPrice">Price</label>
                         <input
-                            type="text"
+                            type="number"
                             id="inputPrice"
                             name="price"
                             placeholder="Price"
@@ -225,31 +209,32 @@ export default function Create() {
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputGenre">Genre</label>
-                        <input
-                            type="text"
+                        <select
                             id="inputGenre"
                             name="genre"
-                            placeholder="Genre"
                             value={values.genre}
                             onChange={onChange}
-                            onBlur={genreValidator}
-                            className={errors.genre && styles['input-error']}
-                        />
-                        {errors.genre && <p className={styles['error-message']}>{errors.genre}</p>}
+                        >
+                            <option value="action">Action</option>
+                            <option value="horror">Horror</option>
+                            <option value="comedy">Comedy</option>
+                            <option value="romance">Romance</option>
+                            <option value="mystery">Mystery</option>
+                            <option value="sports">Sports</option>
+                        </select>
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputStatus">Status</label>
-                        <input
-                            type="text"
+                        <select
                             id="inputStatus"
                             name="status"
-                            placeholder="Status"
                             value={values.status}
                             onChange={onChange}
-                            onBlur={statusValidator}
-                            className={errors.status && styles['input-error']}
-                        />
-                        {errors.status && <p className={styles['error-message']}>{errors.status}</p>}
+                        >
+                            <option value="ongoing">Ongoing</option>
+                            <option value="completed">Completed</option>
+                            <option value="hiatus">On Hiatus</option>
+                        </select>
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputPages">Pages</label>

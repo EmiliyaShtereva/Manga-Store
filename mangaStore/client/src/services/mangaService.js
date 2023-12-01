@@ -1,11 +1,11 @@
-const baseUrl = 'http://localhost:3030/jsonstore/manga';
+const baseUrl = 'http://localhost:3030/data/manga';
 
 export const getAll = async () => {
     const response = await fetch(baseUrl, {
         method: 'GET',
     });
     const result = await response.json();
-    return Object.values(result);
+    return result;
 }
 
 export const getFive = async () => {
@@ -24,7 +24,18 @@ export const getOne = async (mangaId) => {
     return result;
 }
 
-// export const create = async (gameData) => {
-//     const result = await request.post(baseUrl, gameData);
-//     return result;
-// }
+export const create = async (mangaData) => {
+    const token = JSON.parse(localStorage.getItem('accessToken'));
+    const response = await fetch(`${baseUrl}`, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'X-Authorization': token.accessToken
+        },
+        body: JSON.stringify(mangaData)
+
+    });
+    const result = await response.json();
+    console.log(result);
+    return result;
+}

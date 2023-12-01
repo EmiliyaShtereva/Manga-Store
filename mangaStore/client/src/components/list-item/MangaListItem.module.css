@@ -12,7 +12,7 @@
 .card .image-container {
    margin: auto;
    padding: 10px;
-   height: 70%;
+   min-height: 40vh;
    width: 90%;
 }
 
