@@ -23,7 +23,7 @@ export default function MangaDetails() {
                         <img src={manga.imageUrl} alt={manga.name} />
                     </div>
                     <div className={styles['manga-info']}>
-                        <h1>{manga.name}</h1>
+                        <h1>{manga.name} Vol.{manga.volume}</h1>
                         <p className={styles['author']}>{manga.author}</p>
                         <div className={styles['info-container']}>
                             <p className={styles['info']}>Genre: </p> <p>{manga.genre}</p>
@@ -32,16 +32,7 @@ export default function MangaDetails() {
                             <p className={styles['info']}>Status: </p> <p>{manga.status}</p>
                         </div>
                         <div className={styles['info-container']}>
-                            <p className={styles['info']}>Publisher: </p> <p>{manga.publisher}</p>
-                        </div>
-                        <div className={styles['info-container']}>
                             <p className={styles['info']}>Pages: </p> <p>{manga.pages}</p>
-                        </div>
-                        <div className={styles['info-container']}>
-                            <p className={styles['info']}>Dimensions: </p> <p>{manga.dimensions}</p>
-                        </div>
-                        <div className={styles['info-container']}>
-                            <p className={styles['info']}>Publication date: </p> <p>{manga.publicationDate}</p>
                         </div>
                         <div className={styles['info-container']}>
                             <p className={styles['info']}>Language: </p> <p>{manga.language}</p>

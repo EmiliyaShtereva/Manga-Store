@@ -23,6 +23,8 @@ export default function HomePage() {
                     {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />
                     ))}
+
+                    {manga.length === 0 && <h1>There are no manga</h1>}
                 </div>
             </div>
             <Footer />

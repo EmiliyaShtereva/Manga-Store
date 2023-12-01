@@ -69,6 +69,7 @@ export default function SignIn() {
                             onBlur={emailValidator}
                             className={errors.email && styles['input-error']}
                         />
+                        {errors.email && <p className={styles['error-message']}>{errors.email}</p>}
                     </div>
                     <div className={styles['conteiner']}>
                         <label htmlFor="inputPassword">Password</label>
@@ -82,6 +83,7 @@ export default function SignIn() {
                             onBlur={passwordValidator}
                             className={errors.password && styles['input-error']}
                         />
+                        {errors.password && <p className={styles['error-message']}>{errors.password}</p>}
                     </div>
                     <button
                         className={styles['submit-btn']}

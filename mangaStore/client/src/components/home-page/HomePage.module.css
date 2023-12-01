@@ -2,6 +2,12 @@
     background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
 }
 
+.manga-section .heading-text {
+    color: #4e3369;
+    margin: 2%;
+    font-size: 4vh;
+}
+
 .manga-section .manga-container {
     display: flex;
     justify-content: flex-start;
@@ -10,9 +16,8 @@
     background-repeat: no-repeat;
 }
 
-.manga-section .heading-text {
+.manga-section .manga-container h1 {
     color: #4e3369;
-    margin: 2%;
-    font-size: 4vh;
+    margin: 10vh 0 22vh 50vh;
+    font-size: 7vh;
 }
-

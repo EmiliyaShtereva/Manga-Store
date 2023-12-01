@@ -90,7 +90,7 @@ export default function MangaList() {
                         <MangaListItem key={m._id} {...m} />
                     ))}
 
-                    {manga.length === 0 && <h1>There is no manga for this category</h1>}
+                    {manga.length === 0 && <h1>There are no manga for this category</h1>}
                 </div>
             </div>
             <Footer />

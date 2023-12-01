@@ -2,7 +2,6 @@
     padding: 20vh;
     padding-top: 10vh;
     padding-bottom: 10vh;
-    text-align: center;
     background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
 }
 
@@ -31,55 +30,3 @@
     margin-top: 5vh;
     color: #4e3369;
 }
-
-
-
-.contact-conteiner .contact-form {
-    margin-top: 10vh;
-    color: white;
-}
-
-.contact-conteiner .contact-form .conteiner {
-    margin: 0 50vh;
-    font-size: 2.5vh;
-}
-
-.contact-conteiner .contact-form input,
-.contact-conteiner .contact-form textarea {
-    width: 100%;
-    font-size: 2vh;
-    font-family: "Open Sans", sans-serif;
-    padding: 12px 20px;
-    margin: 15px 0;
-    display: inline-block;
-    border: 1px solid #4e4d4d;
-    box-sizing: border-box;
-    border-radius: 2vh;
-    background-color: #222222;
-    color: white;
-  }
-
-  .contact-conteiner .contact-form .submit-btn {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-size: 2.5vh;
-    color: white;
-    background-color: transparent;
-    border: none;
-  }
-  
-  .contact-conteiner .contact-form .submit-btn:hover {
-    color: #b369fe;
-    cursor: pointer;
-  }
-  
-  .contact-conteiner .contact-form .submit-btn:disabled {
-    color: #504f50;
-    cursor: default;
-  }
-
-  .contact-conteiner .contact-form .error-message {
-    margin-top: 0;
-    color: rgb(168, 2, 2);
-    font-size: 2vh;
-  }

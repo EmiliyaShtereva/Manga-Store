@@ -8,22 +8,31 @@ export default function FAQ() {
         <NavBar />
             <div className={styles['questions-conteiner']}>
                 <h1>Frequently asked questions</h1>
-                <p className={styles['question']}>1. Q: What genres of manga do you offer in your online store?</p>
-                <p>A: We pride ourselves on offering a diverse range of manga genres, including but not limited to romance, action, horror, sports and more. Our goal is to cater to the varied tastes of our readers.</p>
-                <p className={styles['question']}>2. Q: How do I purchase manga from your store?</p>
-                <p>A: Purchasing manga from our store is easy! Simply browse our collection, select the titles you want, and add them to your cart. Once you're ready, proceed to checkout, where you can securely complete your purchase using our streamlined payment process.</p>
-                <p className={styles['question']}>3. Q: Do you offer any discounts or promotions?</p>
-                <p>A: Absolutely! We frequently run special promotions and discounts on selected titles. Keep an eye on our website and subscribe to our newsletter to stay informed about exclusive offers, bundle deals, and limited-time discounts.</p>
-                <p className={styles['question']}>4. Q: How can I stay updated on the latest manga releases?</p>
-                <p>A: Stay in the loop by following our social media channels and checking our website regularly. We update our catalog with the latest manga releases, ensuring that you're always informed about the hottest titles hitting the shelves.</p>
-                <p className={styles['question']}>5. Q: Can I pre-order upcoming manga releases from your store?</p>
-                <p>A: Yes, you can! We offer pre-orders for highly anticipated manga releases. Secure your copy in advance, and we'll ensure that it's delivered to you on the release date, so you can be among the first to enjoy the latest adventures.</p>
-                <p className={styles['question']}>6. Q: Is my personal information secure when making a purchase?</p>
-                <p>A: Absolutely. We take the security and privacy of our customers seriously. Our website employs industry-standard encryption protocols to ensure that your personal information is safe and secure during the purchasing process.</p>
-                <p className={styles['question']}>7. Q: Do you have a customer support service if I encounter any issues?</p>
-                <p>A: Yes, we have a dedicated customer support team ready to assist you. If you encounter any issues or have questions, feel free to reach out to our support team through the contact form on our website, and we'll promptly address your concerns.</p>
-                <p className={styles['question']}>8. Q: Do you offer gift cards for your online manga store?</p>
-                <p>A: Yes, we do! Gift cards are a perfect way to share the joy of manga with friends and loved ones. You can purchase digital gift cards in various denominations directly from our website.</p>
+                <h1>For Buyers:</h1>
+                <p className={styles['question']}>1. Q: How do I purchase manga on MANGA HEAVEN?</p>
+                <p>A: To buy manga, simply browse our extensive catalog, select the manga you want, and proceed to checkout. Follow the prompts to complete your purchase securely.</p>
+                <p className={styles['question']}>2. Q: Is my personal information secure when making a purchase?</p>
+                <p>A: Yes, MANGA HEAVEN takes the security of your personal information seriously. We use advanced encryption technologies to ensure that your data is protected during transactions.</p>
+                <p className={styles['question']}>3. Q: Are there any additional fees beyond the manga price?</p>
+                <p>A: MANGA HEAVEN strives to keep transactions transparent. The only additional fees you may encounter are standard payment processing fees. Check our terms for more details.</p>
+                <p className={styles['question']}>4. Q:  How can I track my order?</p>
+                <p>A: Once your order is confirmed, you'll receive a confirmation email with a tracking link. You can use this link to monitor the status and location of your package.</p>
+                <p className={styles['question']}>5. Q: What if I receive a damaged manga?</p>
+                <p>A: If your manga arrives damaged, contact our customer support team with photos of the damage. We'll work with you to resolve the issue promptly.</p>
+                <h1>For Sellers:</h1>
+                <p className={styles['question']}>1. Q: How can I sell my manga on MANGA HEAVEN?</p>
+                <p>A: To sell manga, create a seller account, list your manga with accurate details, and set your price. Your manga will be visible to our community, and interested buyers can make purchases.</p>
+                <p className={styles['question']}>2. Q: Are there any fees for selling manga on MANGA HEAVEN?</p>
+                <p>A: Yes, there is a small transaction fee for each successful sale. This fee helps maintain and improve the MANGA HEAVEN platform. Refer to our seller guidelines for more information.</p>
+                <p className={styles['question']}>3. Q: Can I sell both new and used manga on MANGA HEAVEN?</p>
+                <p>A: Absolutely! MANGA HEAVEN welcomes both new and gently used manga. Ensure to provide accurate details about the condition of your manga in your listings.</p>
+                <p className={styles['question']}>4. Q:  What happens if a buyer is dissatisfied with their purchase?</p>
+                <p>A: If a buyer is unsatisfied, they may initiate a return or contact our support team. As a seller, it's important to accurately represent your manga's condition to avoid potential issues.</p>
+                <h1>General:</h1>
+                <p className={styles['question']}>1. Q: How do I contact MANGA HEAVEN customer support?</p>
+                <p>A: For any inquiries, contact our customer support team through the "Contact Us" page on the MANGA HEAVEN website.</p>
+                <p className={styles['question']}>2. Q: Is MANGA HEAVEN available internationally?</p>
+                <p>A: Yes, MANGA HEAVEN is accessible to users worldwide. We ship to various countries, and sellers can list their manga from different regions.</p>
             </div>
             <Footer />
         </>
