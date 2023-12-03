@@ -34,6 +34,7 @@ function App() {
           <Route path="/liked" element='' />
         </Route>
 
+        <Route path="*" element={<Page404 />} />
       </Routes>
     </AuthProvider>
   )
