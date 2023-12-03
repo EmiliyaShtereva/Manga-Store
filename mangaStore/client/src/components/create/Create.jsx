@@ -31,7 +31,7 @@ export default function Create() {
     const createSubmitHandler = async (values) => {
         try {
             await mangaService.create(values);
-            navigate('/');
+            navigate('/catalog');
         } catch (err) {
             //Error notification
             console.log(err);
