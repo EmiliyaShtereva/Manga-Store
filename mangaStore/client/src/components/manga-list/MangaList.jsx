@@ -7,8 +7,6 @@ import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
 
 export default function MangaList() {
-    const navigate = useNavigate();
-    // const { genre } = useParams();
     const [manga, setManga] = useState([]);
 
     let formInitialstate = {
@@ -19,31 +17,23 @@ export default function MangaList() {
     const [formValues, setFormValues] = useState(formInitialstate);
 
     useEffect(() => {
-        // setFormValues(state => ({
-        //     ...state,
-        // }));
-
         if (formValues.genre == 'all') {
             if (formValues.status == 'all') {
                 mangaService.getAll()
                     .then(result => setManga(result));
             } else {
-                mangaService.getAll()
-                    .then(result => setManga(result.filter(m => m.status.toLowerCase().includes(formValues.status))));
+                mangaService.getStatus(formValues.status)
+                    .then(result => setManga(result));
             }
         } else {
             if (formValues.status == 'all') {
-                mangaService.getAll()
-                    .then(result => setManga(
-                        result
-                            .filter(m => m?.genre.toLowerCase().includes(genre))
-                    ));
+                mangaService.getGanre(formValues.genre)
+                    .then(result => setManga(result));
             } else {
-                mangaService.getAll()
+                mangaService.getGanre(formValues.genre)
                     .then(result => setManga(
                         result
-                            .filter(m => m?.genre.toLowerCase().includes(genre))
-                            .filter(m => m.status.toLowerCase().includes(formValues.status))
+                            .filter(m => m.status.includes(formValues.status))
                     ));
             }
         }
@@ -54,17 +44,13 @@ export default function MangaList() {
             ...state,
             [e.target.name]: e.target.value,
         }));
-
-        // if (e.target.name == 'genre') {
-        //     navigate(`/genre/${e.target.value}`);
-        // }
     };
 
     return (
         <>
             <NavBar />
             <div className={styles['manga-list']}>
-                <h1 className={styles['heading-text']}>{formValues.genre}</h1>
+                <h1 className={styles['heading-text']}>{formValues.genre.toUpperCase()}</h1>
                 <div className={styles['selector']}>
                     <label htmlFor="genre">Genre:</label>
                     <select name="genre" id="genre" onChange={changeHandler} value={formValues.genre}>

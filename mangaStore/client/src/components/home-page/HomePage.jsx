@@ -9,7 +9,7 @@ import Main from '../main/Main';
 export default function HomePage() {
     const [manga, setManga] = useState([]);
     useEffect(() => {
-        mangaService.getFive()
+        mangaService.getLatest()
             .then(result => setManga(result));
     }, []);
 
