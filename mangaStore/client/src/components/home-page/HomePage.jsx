@@ -5,12 +5,19 @@ import MangaListItem from '../list-item/MangaListItem';
 import NavBar from '../navbar/NavBar';
 import styles from './HomePage.module.css';
 import Main from '../main/Main';
+import Spinner from '../spinner/Spinner';
 
 export default function HomePage() {
     const [manga, setManga] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    
     useEffect(() => {
+        setIsLoading(true);
+
         mangaService.getLatest()
-            .then(result => setManga(result));
+            .then(result => setManga(result))
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false))
     }, []);
 
     return (
@@ -19,6 +26,7 @@ export default function HomePage() {
             <div className={styles['manga-section']}>
                 <Main />
                 <h2 className={styles['heading-text']}>Most Recent</h2>
+                {isLoading && <Spinner />}
                 <div className={styles['manga-container']}>
                     {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />

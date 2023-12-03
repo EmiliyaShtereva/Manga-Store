@@ -5,9 +5,11 @@ import styles from './MangaList.module.css';
 import MangaListItem from "../list-item/MangaListItem";
 import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
+import Spinner from "../spinner/Spinner";
 
 export default function MangaList() {
     const [manga, setManga] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     let formInitialstate = {
         genre: 'all',
@@ -17,24 +19,34 @@ export default function MangaList() {
     const [formValues, setFormValues] = useState(formInitialstate);
 
     useEffect(() => {
+        setIsLoading(true);
+
         if (formValues.genre == 'all') {
             if (formValues.status == 'all') {
                 mangaService.getAll()
-                    .then(result => setManga(result));
+                    .then(result => setManga(result))
+                    .catch(err => console.log(err))
+                    .finally(() => setIsLoading(false))
             } else {
                 mangaService.getStatus(formValues.status)
-                    .then(result => setManga(result));
+                    .then(result => setManga(result))
+                    .catch(err => console.log(err))
+                    .finally(() => setIsLoading(false))
             }
         } else {
             if (formValues.status == 'all') {
                 mangaService.getGanre(formValues.genre)
-                    .then(result => setManga(result));
+                    .then(result => setManga(result))
+                    .catch(err => console.log(err))
+                    .finally(() => setIsLoading(false))
             } else {
                 mangaService.getGanre(formValues.genre)
                     .then(result => setManga(
                         result
                             .filter(m => m.status.includes(formValues.status))
-                    ));
+                    ))
+                    .catch(err => console.log(err))
+                    .finally(() => setIsLoading(false))
             }
         }
     }, [formValues.genre, formValues.status]);
@@ -71,6 +83,7 @@ export default function MangaList() {
                         <option value="hiatus">On Hiatus</option>
                     </select>
                 </div>
+                {isLoading && <Spinner />}
                 <div className={styles['manga-container']}>
                     {manga.map(m => (
                         <MangaListItem key={m._id} {...m} />

@@ -4,14 +4,20 @@ import { useParams } from 'react-router-dom';
 import * as mangaService from '../../services/mangaService';
 import Footer from '../footer/Footer';
 import NavBar from '../navbar/NavBar';
+import Spinner from '../spinner/Spinner';
 
 export default function MangaDetails() {
     const [manga, setManga] = useState({});
+    const [isLoading, setIsLoading] = useState(false);
     const { mangaId } = useParams();
 
     useEffect(() => {
+        setIsLoading(true);
+
         mangaService.getOne(mangaId)
-            .then(setManga);
+            .then(setManga)
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false))
     },[])
 
     return (
@@ -19,6 +25,7 @@ export default function MangaDetails() {
             <NavBar />
             <div className={styles['manga-details']}>
                 <div className={styles['header']}>
+                {isLoading && <Spinner />}
                     <div className={styles['image-container']}>
                         <img src={manga.imageUrl} alt={manga.name} />
                     </div>
