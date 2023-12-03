@@ -11,8 +11,8 @@ export default function MangaDetails() {
 
     useEffect(() => {
         mangaService.getOne(mangaId)
-            .then(setManga)
-    })
+            .then(setManga);
+    },[])
 
     return (
         <>
@@ -26,10 +26,10 @@ export default function MangaDetails() {
                         <h1>{manga.name} Vol.{manga.volume}</h1>
                         <p className={styles['author']}>{manga.author}</p>
                         <div className={styles['info-container']}>
-                            <p className={styles['info']}>Genre: </p> <p>{manga.genre}</p>
+                            <p className={styles['info']}>Genre: </p> <p>{manga.genre?.charAt(0).toUpperCase() + manga.genre?.slice(1)}</p>
                         </div>
                         <div className={styles['info-container']}>
-                            <p className={styles['info']}>Status: </p> <p>{manga.status}</p>
+                            <p className={styles['info']}>Status: </p> <p>{manga.status?.charAt(0).toUpperCase() + manga.status?.slice(1)}</p>
                         </div>
                         <div className={styles['info-container']}>
                             <p className={styles['info']}>Pages: </p> <p>{manga.pages}</p>
@@ -37,7 +37,7 @@ export default function MangaDetails() {
                         <div className={styles['info-container']}>
                             <p className={styles['info']}>Language: </p> <p>{manga.language}</p>
                         </div>
-                        <p className={styles['price']}>{manga.price}</p>
+                        <p className={styles['price']}>${manga.price}</p>
                         <div className={styles['buttons']}>
                             <input type="number" defaultValue={1} />
                             <button className={styles['cart']}><i className="fa fa-cart-shopping"></i> Add to cart</button>

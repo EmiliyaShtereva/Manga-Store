@@ -10,7 +10,7 @@ export default function MangaListItem({_id, name, author, price, imageUrl}) {
             </div>
             <p className={styles['name']}>{name}</p>
             <p className={styles['author']}>{author}</p>
-            <p className={styles['price']}>{price}</p>
+            <p className={styles['price']}>${price}</p>
         </div>
     )
 }
