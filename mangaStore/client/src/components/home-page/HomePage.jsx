@@ -25,7 +25,7 @@ export default function HomePage() {
             <NavBar />
             <div className={styles['manga-section']}>
                 <Main />
-                <h2 className={styles['heading-text']}>Most Recent</h2>
+                <h2 className={styles['heading-text']}>Manga</h2>
                 {isLoading && <Spinner />}
                 <div className={styles['manga-container']}>
                     {manga.map(m => (
