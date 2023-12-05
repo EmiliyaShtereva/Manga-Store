@@ -82,3 +82,14 @@ export const edit = async (mangaId, mangaData) => {
     const result = await response.json();
     return result;
 }
+
+export const remove = async (mangaId) => {
+    const token = JSON.parse(localStorage.getItem('accessToken'));
+    await fetch(`${baseUrl}/${mangaId}`, {
+        method: 'DELETE',
+        headers: {
+            'content-type': 'application/json',
+            'X-Authorization': token.accessToken
+        }
+    });
+};

@@ -31,6 +31,15 @@ export default function MangaDetails() {
         }
     }
 
+    const deleteButtonClickHandler = () => {
+        const hasConfirmed = confirm(`Are you sure you want to delete ${manga.name}`);
+
+        if (hasConfirmed) {
+            mangaService.remove(mangaId);
+            navigate('/catalog');
+        }
+    }
+
     return (
         <>
             <NavBar />
@@ -61,7 +70,7 @@ export default function MangaDetails() {
                                 ? (
                                 <>
                                     <button className={styles['edit']} onClick={() => navigate(`/edit/${mangaId}`)}>Edit</button>
-                                    <button className={styles['delete']}>Delete</button>
+                                    <button className={styles['delete']} onClick={deleteButtonClickHandler}>Delete</button>
                                 </>
                                 )
                                 : (<button className={styles['purchase']} onClick={purchaseClickHandler}>Purchase</button>)
