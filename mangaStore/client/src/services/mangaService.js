@@ -67,3 +67,18 @@ export const create = async (mangaData) => {
     const result = await response.json();
     return result;
 }
+
+export const edit = async (mangaId, mangaData) => {
+    const token = JSON.parse(localStorage.getItem('accessToken'));
+    const response = await fetch(`${baseUrl}/${mangaId}`, {
+        method: 'PUT',
+        headers: {
+            'content-type': 'application/json',
+            'X-Authorization': token.accessToken
+        },
+        body: JSON.stringify(mangaData)
+
+    });
+    const result = await response.json();
+    return result;
+}

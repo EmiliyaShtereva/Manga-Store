@@ -20,14 +20,14 @@ export default function MangaDetails() {
         mangaService.getOne(mangaId)
             .then(setManga)
             .catch(err => console.log(err))
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsLoading(false));
     }, []);
 
     const purchaseClickHandler = () => {
         if (isAuthenticated) {
-            navigate(`/purchase/${mangaId}`)
+            navigate(`/purchase/${mangaId}`);
         } else {
-            navigate('/sign-in')
+            navigate('/sign-in');
         }
     }
 
@@ -60,7 +60,7 @@ export default function MangaDetails() {
                             {manga._ownerId == userId
                                 ? (
                                 <>
-                                    <button className={styles['edit']}>Edit</button>
+                                    <button className={styles['edit']} onClick={() => navigate(`/edit/${mangaId}`)}>Edit</button>
                                     <button className={styles['delete']}>Delete</button>
                                 </>
                                 )

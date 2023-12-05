@@ -13,6 +13,7 @@ import Create from "./components/create/Create.jsx";
 import AuthGuards from "./components/guards/AuthGuards.jsx";
 import Page404 from "./components/Page404/Page404.jsx";
 import Purchase from "./components/manga-details/purchase/Purchase.jsx";
+import Edit from "./components/manga-details/edit/Edit.jsx";
 
 function App() {
   return (
@@ -26,11 +27,12 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/questions" element={<FAQ />} />
         <Route path="/details/:mangaId" element={<MangaDetails />} />
-        <Route path="/purchase/:mangaId" element={<Purchase />} />
 
         <Route element={<AuthGuards />}>
           <Route path="/logout" element={<Logout />} />
           <Route path="/create" element={<Create />} />
+          <Route path="/purchase/:mangaId" element={<Purchase />} />
+          <Route path="/edit/:mangaId" element={<Edit />} />
         </Route>
 
         <Route path="*" element={<Page404 />} />

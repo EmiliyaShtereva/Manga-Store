@@ -1,0 +1,117 @@
+.modal {
+  padding: 10vh 0 5vh 0;
+  background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
+}
+
+.form {
+  width: 70vh;
+  border-radius: 3vh;
+  background-color: black;
+  color: white;
+  padding: 5vh;
+  margin: 10vh 0 10vh 65vh;
+  box-shadow: 0.5vh 0.5vh 2vh rgb(33, 3, 42), 0.5vh 0.5vh 2vh rgb(33, 3, 42);
+}
+
+.form .conteiner {
+  padding: 1.5%;
+  font-size: 2.2vh;
+}
+
+.form .title {
+  font-size: 4vh;
+}
+
+.form input {
+  width: 100%;
+  height: 5vh;
+  font-size: 2vh;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #4e4d4d;
+  box-sizing: border-box;
+  border-radius: 2vh;
+  background-color: #222222;
+  color: white;
+}
+
+.form textarea, .form select {
+  width: 100%;
+  font-size: 2vh;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #4e4d4d;
+  box-sizing: border-box;
+  border-radius: 2vh;
+  background-color: #222222;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+}
+
+.form input.input-error,
+.form textarea.input-error {
+  font-family: "Open Sans", sans-serif;
+  border-color: #6c0505;
+}
+
+.form .close-btn {
+  position: absolute;
+  right: 25px;
+  top: 20px;
+  background-color: transparent;
+  color: #3f3f3f;
+  font-size: 2.5vh;
+  border: none;
+}
+
+.form .close-btn:hover {
+  color: #6c0505;
+  cursor: pointer;
+}
+
+.form .submit-btn {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 2.5vh;
+  color: white;
+  background-color: transparent;
+  border: none;
+}
+
+.form .submit-btn:hover {
+  color: #b369fe;
+  cursor: pointer;
+}
+
+.form .submit-btn:disabled {
+  color: #504f50;
+  cursor: default;
+}
+
+.acount-text {
+  color: #4e4d4d;
+  font-size: 1.7vh;
+}
+
+.forms-btn {
+  background-color: transparent;
+  color: #b369fe;
+  font-size: 1.7vh;
+  text-decoration: none;
+}
+
+.forms-btn:hover {
+  color: #9759d5;
+  cursor: pointer;
+}
+
+.error-message {
+  margin-top: 0;
+  color: rgb(168, 2, 2);
+  font-size: 1.7vh;
+}
