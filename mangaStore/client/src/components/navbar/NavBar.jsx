@@ -5,7 +5,7 @@ import SideNav from './side-nav/SideNav';
 import AuthContext from '../../context/authContext';
 
 export default function NavBar() {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, email } = useContext(AuthContext);
     const [showSideNav, setShowSideNav] = useState(false);
 
     const navClickHandler = () => {
@@ -16,13 +16,6 @@ export default function NavBar() {
         <>
             <nav className={styles['nav-bar']}>
                 <button className={styles['left']} onClick={navClickHandler}><i className="fa fa-bars"></i></button>
-
-                <div className={styles['search-container']}>
-                    <form>
-                        <button className={styles['left']} type="submit"><i className="fa fa-search"></i></button>
-                        <input className={styles['left']} type="text" placeholder="Search.." name="search" />
-                    </form>
-                </div>
                 <div className={styles['site-logo']}>
                     <Link to="/">
                         <img src="/images/logo3.png" alt="logo" />
@@ -36,8 +29,7 @@ export default function NavBar() {
                     && (
                         <>
                             <div className={styles['right']}><Link to="/logout">Logout</Link></div>
-                            <div className={styles['right']}><Link to="/cart"><i className="fa fa-cart-shopping"></i></Link></div>
-                            <div className={styles['right']}><Link to="/liked"><i className="fa fa-heart"></i></Link></div>
+                            <div className={styles['right']}><p>Welcome, {email}</p></div>
                         </>
                     )}
             </nav>

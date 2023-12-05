@@ -13,7 +13,6 @@ export const getAll = async () => {
 
 export const getLatest = async () => {
     const query = new URLSearchParams({
-        sortBy: '_createdOn',
         offset: 0,
         pageSize: 15
     })
@@ -32,7 +31,7 @@ export const getOne = async (mangaId) => {
     return result;
 }
 
-export const getGanre = async (genre) => {
+export const getGenre = async (genre) => {
     const query = new URLSearchParams({
         where: `genre="${genre}"`
     })
@@ -53,17 +52,6 @@ export const getStatus = async (status) => {
     const result = await response.json();
     return result;
 }
-
-// export const getGanreAndStatus = async (genre, status) => {
-//     const query = new URLSearchParams({
-//         where: `genre="${genre}"-AND-status="${status}"`
-//     })
-//     const response = await fetch(`${baseUrl}?${query}`, {
-//         method: 'GET',
-//     });
-//     const result = await response.json();
-//     return result;
-// }
 
 export const create = async (mangaData) => {
     const token = JSON.parse(localStorage.getItem('accessToken'));

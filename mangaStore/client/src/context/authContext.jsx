@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
         signUpSubmitHandler,
         logoutHandler,
         isAuthenticated: !!auth.accessToken,
+        email: auth.email,
         errorMessage
     }
 

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import * as mangaService from '../../services/mangaService';
-import styles from './MangaList.module.css';
+import styles from './Catalog.module.css';
 import MangaListItem from "../list-item/MangaListItem";
 import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
 import Spinner from "../spinner/Spinner";
 
-export default function MangaList() {
+export default function Catalog() {
     const [manga, setManga] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -35,12 +34,12 @@ export default function MangaList() {
             }
         } else {
             if (formValues.status == 'all') {
-                mangaService.getGanre(formValues.genre)
+                mangaService.getGenre(formValues.genre)
                     .then(result => setManga(result))
                     .catch(err => console.log(err))
                     .finally(() => setIsLoading(false))
             } else {
-                mangaService.getGanre(formValues.genre)
+                mangaService.getGenre(formValues.genre)
                     .then(result => setManga(
                         result
                             .filter(m => m.status.includes(formValues.status))
