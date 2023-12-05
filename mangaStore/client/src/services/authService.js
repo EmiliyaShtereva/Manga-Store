@@ -26,8 +26,13 @@ export const register = async (data) => {
 }
 
 export const logout = async () => {
+    const token = JSON.parse(localStorage.getItem('accessToken'));
     await fetch(`${baseUrl}/logout`, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            'content-type': 'application/json',
+            'X-Authorization': token.accessToken
+        }
     });
     return {};
 }

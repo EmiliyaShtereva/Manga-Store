@@ -5,7 +5,7 @@ import SideNav from './side-nav/SideNav';
 import AuthContext from '../../context/authContext';
 
 export default function NavBar() {
-    const { isAuthenticated, email } = useContext(AuthContext);
+    const { isAuthenticated, username } = useContext(AuthContext);
     const [showSideNav, setShowSideNav] = useState(false);
 
     const navClickHandler = () => {
@@ -29,7 +29,7 @@ export default function NavBar() {
                     && (
                         <>
                             <div className={styles['right']}><Link to="/logout">Logout</Link></div>
-                            <div className={styles['right']}><p>Welcome, {email}</p></div>
+                            <div className={styles['right']}><p>Welcome, {username}</p></div>
                         </>
                     )}
             </nav>

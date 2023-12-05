@@ -64,41 +64,26 @@
 }
 
 .manga-details .header .manga-info .buttons {
-    margin-top: 3vh;
-}
-
-.manga-details .header .manga-info .buttons input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-  }
-
-.manga-details .header .manga-info .buttons input{
-    width: 6vh;
-    height: 5vh;
-    margin-right: 0.2vh;
-    text-align: center;
-    font-size: 2.5vh;
-    background-color: transparent;
-    color: white;
-    border-radius: 2vh;
-    border: 0.2vh solid rgb(31, 31, 31);
+    margin-top: 5vh;
 }
 
 .manga-details .header .manga-info .buttons button{
     width: 25vh;
     height: 6vh;
-    margin-right: 0.2vh;
+    margin-right: 1vh;
     text-align: center;
     font-size: 2.5vh;
     background-color: transparent;
     color: white;
     border-radius: 2vh;
-    border: none;
+    border: 0.2vh solid white;
 }
 
 .manga-details .header .manga-info .buttons button:hover{
     cursor: pointer;
-    color: #b369fe;
+    color: #27123a;
     border: 0.2vh solid #b369fe;
+    background-color: #b369fe;
 }
 
 .manga-details .header .synopsis {

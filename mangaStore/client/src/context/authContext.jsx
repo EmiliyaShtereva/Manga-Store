@@ -37,13 +37,13 @@ export const AuthProvider = ({ children }) => {
             setErrorMessage(result.message);
         } else {
             setErrorMessage('');
-            setAuth(result);
-            navigate('/');
+            navigate('/login');
         }
     }
 
     const logoutHandler = async () => {
-        setAuth({});
+        const result = await authService.logout();
+        setAuth(result);
         localStorage.removeItem('accessToken');
     }
 
@@ -52,7 +52,9 @@ export const AuthProvider = ({ children }) => {
         signUpSubmitHandler,
         logoutHandler,
         isAuthenticated: !!auth.accessToken,
-        email: auth.email,
+        username: auth.username,
+        userId: auth._id,
+        user: auth,
         errorMessage
     }
 

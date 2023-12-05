@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import styles from './MangaDetails.module.css'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as mangaService from '../../services/mangaService';
 import Footer from '../footer/Footer';
 import NavBar from '../navbar/NavBar';
 import Spinner from '../spinner/Spinner';
+import AuthContext from '../../context/authContext';
 
 export default function MangaDetails() {
+    const navigate = useNavigate();
+    const { isAuthenticated, userId } = useContext(AuthContext);
     const [manga, setManga] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const { mangaId } = useParams();
@@ -18,14 +21,22 @@ export default function MangaDetails() {
             .then(setManga)
             .catch(err => console.log(err))
             .finally(() => setIsLoading(false))
-    },[])
+    }, []);
+
+    const purchaseClickHandler = () => {
+        if (isAuthenticated) {
+            navigate(`/purchase/${mangaId}`)
+        } else {
+            navigate('/sign-in')
+        }
+    }
 
     return (
         <>
             <NavBar />
             <div className={styles['manga-details']}>
                 <div className={styles['header']}>
-                {isLoading && <Spinner />}
+                    {isLoading && <Spinner />}
                     <div className={styles['image-container']}>
                         <img src={manga.imageUrl} alt={manga.name} />
                     </div>
@@ -46,9 +57,15 @@ export default function MangaDetails() {
                         </div>
                         <p className={styles['price']}>${manga.price}</p>
                         <div className={styles['buttons']}>
-                            <input type="number" defaultValue={1} />
-                            <button className={styles['cart']}><i className="fa fa-cart-shopping"></i> Add to cart</button>
-                            <button className={styles['like']}><i className="fa fa-heart"></i> Add to liked</button>
+                            {manga._ownerId == userId
+                                ? (
+                                <>
+                                    <button className={styles['edit']}>Edit</button>
+                                    <button className={styles['delete']}>Delete</button>
+                                </>
+                                )
+                                : (<button className={styles['purchase']} onClick={purchaseClickHandler}>Purchase</button>)
+                            }
                         </div>
                     </div>
                     <div className={styles['synopsis']}>
