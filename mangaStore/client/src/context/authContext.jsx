@@ -15,39 +15,55 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const signInSubmitHandler = async (values) => {
-        const result = await authService.login({ email: values.email, password: values.password });
-
-        if (result?.code >= 400) {
-            setErrorMessage(result.message);
-        } else {
-            setErrorMessage('');
-            setAuth(result);
-            navigate('/');
-        }
+        await authService.login({ email: values.email, password: values.password })
+            .then((result) => {
+                if (result?.code >= 400) {
+                    setErrorMessage(result.message);
+                } else {
+                    setErrorMessage('');
+                    setAuth(result);
+                    navigate('/');
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            });
     }
 
     const signUpSubmitHandler = async (values) => {
-        const result = await authService.register({
+        await authService.register({
             email: values.email,
             password: values.password,
             firstName: values.firstName,
             lastName: values.lastName,
             username: values.username,
             address: values.address
-        });
-
-        if (result?.code >= 400) {
-            setErrorMessage(result.message);
-        } else {
-            setErrorMessage('');
-            navigate('/login');
-        }
+        })
+            .then((result) => {
+                if (result?.code >= 400) {
+                    setErrorMessage(result.message);
+                } else {
+                    setErrorMessage('');
+                    navigate('/sign-in');
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            });
     }
 
     const logoutHandler = async () => {
-        const result = await authService.logout();
-        setAuth(result);
-        localStorage.removeItem('accessToken');
+        await authService.logout()
+            .then((result) => {
+                setAuth(result);
+                localStorage.removeItem('accessToken');
+            })
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            });
     }
 
     const searchHandler = async (values) => {
@@ -57,7 +73,10 @@ export const AuthProvider = ({ children }) => {
                 setSearchInfo(result);
                 navigate('/search');
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
             .finally(() => setIsLoading(false))
     }
 

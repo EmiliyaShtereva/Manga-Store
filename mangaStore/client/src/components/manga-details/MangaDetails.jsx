@@ -39,8 +39,12 @@ export default function MangaDetails() {
         const hasConfirmed = confirm(`Are you sure you want to delete ${manga.name}`);
 
         if (hasConfirmed) {
-            mangaService.remove(mangaId);
-            navigate('/catalog');
+            mangaService.remove(mangaId)
+                .then(navigate('/catalog'))
+                .catch(err => {
+                    console.log(err);
+                    navigate('/something-went-wrong');
+                })
         }
     }
 
@@ -63,12 +67,12 @@ export default function MangaDetails() {
                             <p className={styles['info']}>Status: </p> <p>{manga.status?.charAt(0).toUpperCase() + manga.status?.slice(1)}</p>
                         </div>
                         <div className={styles['info-container']}>
-                            <p className={styles['info']}>Pages: </p> <p>{manga.pages}</p>
+                            <p className={styles['info']}>Pages: </p> <p>{manga?.pages}</p>
                         </div>
                         <div className={styles['info-container']}>
                             <p className={styles['info']}>Language: </p> <p>{manga.language}</p>
                         </div>
-                        <p className={styles['price']}>${manga.price}</p>
+                        <p className={styles['price']}>${manga?.price}</p>
                         <div className={styles['buttons']}>
                             {manga._ownerId == userId
                                 ? (
