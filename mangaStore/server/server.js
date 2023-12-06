@@ -1,11 +1,10 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('http'), require('fs'), require('crypto')) :
-        typeof define === 'function' && define.amd ? define(['http', 'fs', 'crypto'], factory) :
-            (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Server = factory(global.http, global.fs, global.crypto));
-}(this, (function (http, fs, crypto) {
-    'use strict';
+    typeof define === 'function' && define.amd ? define(['http', 'fs', 'crypto'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Server = factory(global.http, global.fs, global.crypto));
+}(this, (function (http, fs, crypto) { 'use strict';
 
-    function _interopDefaultLegacy(e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+    function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
     var http__default = /*#__PURE__*/_interopDefaultLegacy(http);
     var fs__default = /*#__PURE__*/_interopDefaultLegacy(fs);
@@ -14,14 +13,14 @@
     class ServiceError extends Error {
         constructor(message = 'Service Error') {
             super(message);
-            this.name = 'ServiceError';
+            this.name = 'ServiceError'; 
         }
     }
 
     class NotFoundError extends ServiceError {
         constructor(message = 'Resource not found') {
             super(message);
-            this.name = 'NotFoundError';
+            this.name = 'NotFoundError'; 
             this.status = 404;
         }
     }
@@ -29,7 +28,7 @@
     class RequestError extends ServiceError {
         constructor(message = 'Request error') {
             super(message);
-            this.name = 'RequestError';
+            this.name = 'RequestError'; 
             this.status = 400;
         }
     }
@@ -37,7 +36,7 @@
     class ConflictError extends ServiceError {
         constructor(message = 'Resource conflict') {
             super(message);
-            this.name = 'ConflictError';
+            this.name = 'ConflictError'; 
             this.status = 409;
         }
     }
@@ -45,7 +44,7 @@
     class AuthorizationError extends ServiceError {
         constructor(message = 'Unauthorized') {
             super(message);
-            this.name = 'AuthorizationError';
+            this.name = 'AuthorizationError'; 
             this.status = 401;
         }
     }
@@ -53,7 +52,7 @@
     class CredentialError extends ServiceError {
         constructor(message = 'Forbidden') {
             super(message);
-            this.name = 'CredentialError';
+            this.name = 'CredentialError'; 
             this.status = 403;
         }
     }
@@ -97,7 +96,7 @@
                     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                     'Access-Control-Allow-Credentials': false,
                     'Access-Control-Max-Age': '86400',
-                    'Access-Control-Allow-Headers': 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, X-Authorization'
+                    'Access-Control-Allow-Headers': 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, X-Authorization, X-Admin'
                 });
             } else {
                 try {
@@ -147,10 +146,13 @@
                     result = await service(context, { method, tokens, query, body });
                 }
 
-                // NOTE: currently there is no scenario where result is undefined - it will either be data, or an error object;
-                // this may change with further extension of the services, so this check should stay in place
+                // NOTE: logout does not return a result
+                // in this case the content type header should be omitted, to allow checks on the client
                 if (result !== undefined) {
                     result = JSON.stringify(result);
+                } else {
+                    status = 204;
+                    delete headers['Content-Type'];
                 }
             }
         };
@@ -258,6 +260,15 @@
         }
 
         /**
+         * Register PATCH action
+         * @param {string} name Action name. Can be a glob pattern.
+         * @param {(context, tokens: string[], query: *, body: *)} handler Request handler
+         */
+        patch(name, handler) {
+            this.registerAction('PATCH', name, handler);
+        }
+
+        /**
          * Register DELETE action
          * @param {string} name Action name. Can be a glob pattern.
          * @param {(context, tokens: string[], query: *, body: *)} handler Request handler
@@ -297,7 +308,7 @@
     const uuid$1 = util.uuid;
 
 
-    const data = fs__default['default'].readdirSync('./data').reduce((p, c) => {
+    const data = fs__default['default'].existsSync('./data') ? fs__default['default'].readdirSync('./data').reduce((p, c) => {
         const content = JSON.parse(fs__default['default'].readFileSync('./data/' + c));
         const collection = c.slice(0, -5);
         p[collection] = {};
@@ -305,7 +316,7 @@
             p[collection][endpoint] = content[endpoint];
         }
         return p;
-    }, {});
+    }, {}) : {};
 
     const actions = {
         get: (context, tokens, query, body) => {
@@ -336,6 +347,21 @@
             return responseData[newId];
         },
         put: (context, tokens, query, body) => {
+            tokens = [context.params.collection, ...tokens];
+            console.log('Request body:\n', body);
+
+            let responseData = data;
+            for (let token of tokens.slice(0, -1)) {
+                if (responseData !== undefined) {
+                    responseData = responseData[token];
+                }
+            }
+            if (responseData !== undefined && responseData[tokens.slice(-1)] !== undefined) {
+                responseData[tokens.slice(-1)] = body;
+            }
+            return responseData[tokens.slice(-1)];
+        },
+        patch: (context, tokens, query, body) => {
             tokens = [context.params.collection, ...tokens];
             console.log('Request body:\n', body);
 
@@ -374,6 +400,7 @@
     dataService.get(':collection', actions.get);
     dataService.post(':collection', actions.post);
     dataService.put(':collection', actions.put);
+    dataService.patch(':collection', actions.patch);
     dataService.delete(':collection', actions.delete);
 
 
@@ -383,12 +410,27 @@
      * This service requires storage and auth plugins
      */
 
+    const { AuthorizationError: AuthorizationError$1 } = errors;
+
+
+
     const userService = new Service_1();
 
+    userService.get('me', getSelf);
     userService.post('register', onRegister);
     userService.post('login', onLogin);
     userService.get('logout', onLogout);
-    // TODO: get user details
+
+
+    function getSelf(context, tokens, query, body) {
+        if (context.user) {
+            const result = Object.assign({}, context.user);
+            delete result.hashedPassword;
+            return result;
+        } else {
+            throw new AuthorizationError$1();
+        }
+    }
 
     function onRegister(context, tokens, query, body) {
         return context.auth.register(body);
@@ -404,18 +446,17 @@
 
     var users = userService.parseRequest;
 
-    /*
-     * This service requires storage and auth plugins
-     */
-
-    const { NotFoundError: NotFoundError$1, RequestError: RequestError$1, CredentialError: CredentialError$1, AuthorizationError: AuthorizationError$1 } = errors;
+    const { NotFoundError: NotFoundError$1, RequestError: RequestError$1 } = errors;
 
 
-    const dataService$1 = new Service_1();
-    dataService$1.get(':collection', get);
-    dataService$1.post(':collection', post);
-    dataService$1.put(':collection', put);
-    dataService$1.delete(':collection', del);
+    var crud = {
+        get,
+        post,
+        put,
+        patch,
+        delete: del
+    };
+
 
     function validateRequest(context, tokens, query) {
         /*
@@ -488,21 +529,6 @@
                 return context.storage.get();
             }
 
-            if (query.distinct) {
-                const props = query.distinct.split(',').filter(p => p != '');
-                responseData = Object.values(responseData.reduce((distinct, c) => {
-                    const key = props.map(p => c[p]).join('::');
-                    if (distinct.hasOwnProperty(key) == false) {
-                        distinct[key] = c;
-                    }
-                    return distinct;
-                }, {}));
-            }
-
-            if (query.count) {
-                return responseData.length;
-            }
-
             if (query.sortBy) {
                 const props = query.sortBy
                     .split(',')
@@ -510,7 +536,7 @@
                     .map(p => p.split(' ').filter(p => p != ''))
                     .map(([p, desc]) => ({ prop: p, desc: desc ? true : false }));
 
-                // Sorting priority is from first ot last, therefore we sort from last to first
+                // Sorting priority is from first to last, therefore we sort from last to first
                 for (let i = props.length - 1; i >= 0; i--) {
                     let { prop, desc } = props[i];
                     responseData.sort(({ [prop]: propA }, { [prop]: propB }) => {
@@ -529,6 +555,21 @@
             const pageSize = Number(query.pageSize) || 10;
             if (query.pageSize) {
                 responseData = responseData.slice(0, pageSize);
+            }
+    		
+    		if (query.distinct) {
+                const props = query.distinct.split(',').filter(p => p != '');
+                responseData = Object.values(responseData.reduce((distinct, c) => {
+                    const key = props.map(p => c[p]).join('::');
+                    if (distinct.hasOwnProperty(key) == false) {
+                        distinct[key] = c;
+                    }
+                    return distinct;
+                }, {}));
+            }
+
+            if (query.count) {
+                return responseData.length;
             }
 
             if (query.select) {
@@ -570,6 +611,8 @@
             }
         }
 
+        context.canAccess(responseData);
+
         return responseData;
     }
 
@@ -580,14 +623,10 @@
         if (tokens.length > 0) {
             throw new RequestError$1('Use PUT to update records');
         }
+        context.canAccess(undefined, body);
 
+        body._ownerId = context.user._id;
         let responseData;
-
-        if (context.user) {
-            body._ownerId = context.user._id;
-        } else {
-            throw new AuthorizationError$1();
-        }
 
         try {
             responseData = context.storage.add(context.params.collection, body);
@@ -607,11 +646,6 @@
         }
 
         let responseData;
-
-        if (!context.user) {
-            throw new AuthorizationError$1();
-        }
-
         let existing;
 
         try {
@@ -620,12 +654,38 @@
             throw new NotFoundError$1();
         }
 
-        if (context.user._id !== existing._ownerId) {
-            throw new CredentialError$1();
-        }
+        context.canAccess(existing, body);
 
         try {
             responseData = context.storage.set(context.params.collection, tokens[0], body);
+        } catch (err) {
+            throw new RequestError$1();
+        }
+
+        return responseData;
+    }
+
+    function patch(context, tokens, query, body) {
+        console.log('Request body:\n', body);
+
+        validateRequest(context, tokens);
+        if (tokens.length != 1) {
+            throw new RequestError$1('Missing entry ID');
+        }
+
+        let responseData;
+        let existing;
+
+        try {
+            existing = context.storage.get(context.params.collection, tokens[0]);
+        } catch (err) {
+            throw new NotFoundError$1();
+        }
+
+        context.canAccess(existing, body);
+
+        try {
+            responseData = context.storage.merge(context.params.collection, tokens[0], body);
         } catch (err) {
             throw new RequestError$1();
         }
@@ -640,11 +700,6 @@
         }
 
         let responseData;
-
-        if (!context.user) {
-            throw new AuthorizationError$1();
-        }
-
         let existing;
 
         try {
@@ -653,9 +708,7 @@
             throw new NotFoundError$1();
         }
 
-        if (context.user._id !== existing._ownerId) {
-            throw new CredentialError$1();
-        }
+        context.canAccess(existing);
 
         try {
             responseData = context.storage.delete(context.params.collection, tokens[0]);
@@ -666,6 +719,16 @@
         return responseData;
     }
 
+    /*
+     * This service requires storage and auth plugins
+     */
+
+    const dataService$1 = new Service_1();
+    dataService$1.get(':collection', crud.get);
+    dataService$1.post(':collection', crud.post);
+    dataService$1.put(':collection', crud.put);
+    dataService$1.patch(':collection', crud.patch);
+    dataService$1.delete(':collection', crud.delete);
 
     var data$1 = dataService$1.parseRequest;
 
@@ -686,7 +749,7 @@
         };
     };
 
-    var require$$0 = "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n    <title>SUPS Admin Panel</title>\r\n    <style>\r\n        * {\r\n            padding: 0;\r\n            margin: 0;\r\n        }\r\n\r\n        body {\r\n            padding: 32px;\r\n            font-size: 16px;\r\n        }\r\n\r\n        .layout::after {\r\n            content: '';\r\n            clear: both;\r\n            display: table;\r\n        }\r\n\r\n        .col {\r\n            display: block;\r\n            float: left;\r\n        }\r\n\r\n        p {\r\n            padding: 8px 16px;\r\n        }\r\n\r\n        table {\r\n            border-collapse: collapse;\r\n        }\r\n\r\n        caption {\r\n            font-size: 120%;\r\n            text-align: left;\r\n            padding: 4px 8px;\r\n            font-weight: bold;\r\n            background-color: #ddd;\r\n        }\r\n\r\n        table, tr, th, td {\r\n            border: 1px solid #ddd;\r\n        }\r\n\r\n        th, td {\r\n            padding: 4px 8px;\r\n        }\r\n\r\n        ul {\r\n            list-style: none;\r\n        }\r\n\r\n        .collection-list a {\r\n            display: block;\r\n            width: 120px;\r\n            padding: 4px 8px;\r\n            text-decoration: none;\r\n            color: black;\r\n            background-color: #ccc;\r\n        }\r\n        .collection-list a:hover {\r\n            background-color: #ddd;\r\n        }\r\n        .collection-list a:visited {\r\n            color: black;\r\n        }\r\n    </style>\r\n    <script type=\"module\">\nimport { html, render } from 'https://unpkg.com/lit-html?module';\nimport { until } from 'https://unpkg.com/lit-html/directives/until?module';\n\nconst api = {\r\n    async get(url) {\r\n        return json(url);\r\n    },\r\n    async post(url, body) {\r\n        return json(url, {\r\n            method: 'POST',\r\n            headers: { 'Content-Type': 'application/json' },\r\n            body: JSON.stringify(body)\r\n        });\r\n    }\r\n};\r\n\r\nasync function json(url, options) {\r\n    return await (await fetch('/' + url, options)).json();\r\n}\r\n\r\nasync function getCollections() {\r\n    return api.get('data');\r\n}\r\n\r\nasync function getRecords(collection) {\r\n    return api.get('data/' + collection);\r\n}\r\n\r\nasync function getThrottling() {\r\n    return api.get('util/throttle');\r\n}\r\n\r\nasync function setThrottling(throttle) {\r\n    return api.post('util', { throttle });\r\n}\n\nasync function collectionList(onSelect) {\r\n    const collections = await getCollections();\r\n\r\n    return html`\r\n    <ul class=\"collection-list\">\r\n        ${collections.map(collectionLi)}\r\n    </ul>`;\r\n\r\n    function collectionLi(name) {\r\n        return html`<li><a href=\"javascript:void(0)\" @click=${(ev) => onSelect(ev, name)}>${name}</a></li>`;\r\n    }\r\n}\n\nasync function recordTable(collectionName) {\r\n    const records = await getRecords(collectionName);\r\n    const layout = getLayout(records);\r\n\r\n    return html`\r\n    <table>\r\n        <caption>${collectionName}</caption>\r\n        <thead>\r\n            <tr>${layout.map(f => html`<th>${f}</th>`)}</tr>\r\n        </thead>\r\n        <tbody>\r\n            ${records.map(r => recordRow(r, layout))}\r\n        </tbody>\r\n    </table>`;\r\n}\r\n\r\nfunction getLayout(records) {\r\n    const result = new Set(['_id']);\r\n    records.forEach(r => Object.keys(r).forEach(k => result.add(k)));\r\n\r\n    return [...result.keys()];\r\n}\r\n\r\nfunction recordRow(record, layout) {\r\n    return html`\r\n    <tr>\r\n        ${layout.map(f => html`<td>${JSON.stringify(record[f]) || html`<span>(missing)</span>`}</td>`)}\r\n    </tr>`;\r\n}\n\nasync function throttlePanel(display) {\r\n    const active = await getThrottling();\r\n\r\n    return html`\r\n    <p>\r\n        Request throttling: </span>${active}</span>\r\n        <button @click=${(ev) => set(ev, true)}>Enable</button>\r\n        <button @click=${(ev) => set(ev, false)}>Disable</button>\r\n    </p>`;\r\n\r\n    async function set(ev, state) {\r\n        ev.target.disabled = true;\r\n        await setThrottling(state);\r\n        display();\r\n    }\r\n}\n\n//import page from '//unpkg.com/page/page.mjs';\r\n\r\n\r\nfunction start() {\r\n    const main = document.querySelector('main');\r\n    editor(main);\r\n}\r\n\r\nasync function editor(main) {\r\n    let list = html`<div class=\"col\">Loading&hellip;</div>`;\r\n    let viewer = html`<div class=\"col\">\r\n    <p>Select collection to view records</p>\r\n</div>`;\r\n    display();\r\n\r\n    list = html`<div class=\"col\">${await collectionList(onSelect)}</div>`;\r\n    display();\r\n\r\n    async function display() {\r\n        render(html`\r\n        <section class=\"layout\">\r\n            ${until(throttlePanel(display), html`<p>Loading</p>`)}\r\n        </section>\r\n        <section class=\"layout\">\r\n            ${list}\r\n            ${viewer}\r\n        </section>`, main);\r\n    }\r\n\r\n    async function onSelect(ev, name) {\r\n        ev.preventDefault();\r\n        viewer = html`<div class=\"col\">${await recordTable(name)}</div>`;\r\n        display();\r\n    }\r\n}\r\n\r\nstart();\n\n</script>\r\n</head>\r\n<body>\r\n    <main>\r\n        Loading&hellip;\r\n    </main>\r\n</body>\r\n</html>";
+    var require$$0 = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>SUPS Admin Panel</title>\n    <style>\n        * {\n            padding: 0;\n            margin: 0;\n        }\n\n        body {\n            padding: 32px;\n            font-size: 16px;\n        }\n\n        .layout::after {\n            content: '';\n            clear: both;\n            display: table;\n        }\n\n        .col {\n            display: block;\n            float: left;\n        }\n\n        p {\n            padding: 8px 16px;\n        }\n\n        table {\n            border-collapse: collapse;\n        }\n\n        caption {\n            font-size: 120%;\n            text-align: left;\n            padding: 4px 8px;\n            font-weight: bold;\n            background-color: #ddd;\n        }\n\n        table, tr, th, td {\n            border: 1px solid #ddd;\n        }\n\n        th, td {\n            padding: 4px 8px;\n        }\n\n        ul {\n            list-style: none;\n        }\n\n        .collection-list a {\n            display: block;\n            width: 120px;\n            padding: 4px 8px;\n            text-decoration: none;\n            color: black;\n            background-color: #ccc;\n        }\n        .collection-list a:hover {\n            background-color: #ddd;\n        }\n        .collection-list a:visited {\n            color: black;\n        }\n    </style>\n    <script type=\"module\">\nimport { html, render } from 'https://unpkg.com/lit-html@1.3.0?module';\nimport { until } from 'https://unpkg.com/lit-html@1.3.0/directives/until?module';\n\nconst api = {\n    async get(url) {\n        return json(url);\n    },\n    async post(url, body) {\n        return json(url, {\n            method: 'POST',\n            headers: { 'Content-Type': 'application/json' },\n            body: JSON.stringify(body)\n        });\n    }\n};\n\nasync function json(url, options) {\n    return await (await fetch('/' + url, options)).json();\n}\n\nasync function getCollections() {\n    return api.get('data');\n}\n\nasync function getRecords(collection) {\n    return api.get('data/' + collection);\n}\n\nasync function getThrottling() {\n    return api.get('util/throttle');\n}\n\nasync function setThrottling(throttle) {\n    return api.post('util', { throttle });\n}\n\nasync function collectionList(onSelect) {\n    const collections = await getCollections();\n\n    return html`\n    <ul class=\"collection-list\">\n        ${collections.map(collectionLi)}\n    </ul>`;\n\n    function collectionLi(name) {\n        return html`<li><a href=\"javascript:void(0)\" @click=${(ev) => onSelect(ev, name)}>${name}</a></li>`;\n    }\n}\n\nasync function recordTable(collectionName) {\n    const records = await getRecords(collectionName);\n    const layout = getLayout(records);\n\n    return html`\n    <table>\n        <caption>${collectionName}</caption>\n        <thead>\n            <tr>${layout.map(f => html`<th>${f}</th>`)}</tr>\n        </thead>\n        <tbody>\n            ${records.map(r => recordRow(r, layout))}\n        </tbody>\n    </table>`;\n}\n\nfunction getLayout(records) {\n    const result = new Set(['_id']);\n    records.forEach(r => Object.keys(r).forEach(k => result.add(k)));\n\n    return [...result.keys()];\n}\n\nfunction recordRow(record, layout) {\n    return html`\n    <tr>\n        ${layout.map(f => html`<td>${JSON.stringify(record[f]) || html`<span>(missing)</span>`}</td>`)}\n    </tr>`;\n}\n\nasync function throttlePanel(display) {\n    const active = await getThrottling();\n\n    return html`\n    <p>\n        Request throttling: </span>${active}</span>\n        <button @click=${(ev) => set(ev, true)}>Enable</button>\n        <button @click=${(ev) => set(ev, false)}>Disable</button>\n    </p>`;\n\n    async function set(ev, state) {\n        ev.target.disabled = true;\n        await setThrottling(state);\n        display();\n    }\n}\n\n//import page from '//unpkg.com/page/page.mjs';\n\n\nfunction start() {\n    const main = document.querySelector('main');\n    editor(main);\n}\n\nasync function editor(main) {\n    let list = html`<div class=\"col\">Loading&hellip;</div>`;\n    let viewer = html`<div class=\"col\">\n    <p>Select collection to view records</p>\n</div>`;\n    display();\n\n    list = html`<div class=\"col\">${await collectionList(onSelect)}</div>`;\n    display();\n\n    async function display() {\n        render(html`\n        <section class=\"layout\">\n            ${until(throttlePanel(display), html`<p>Loading</p>`)}\n        </section>\n        <section class=\"layout\">\n            ${list}\n            ${viewer}\n        </section>`, main);\n    }\n\n    async function onSelect(ev, name) {\n        ev.preventDefault();\n        viewer = html`<div class=\"col\">${await recordTable(name)}</div>`;\n        display();\n    }\n}\n\nstart();\n\n</script>\n</head>\n<body>\n    <main>\n        Loading&hellip;\n    </main>\n</body>\n</html>";
 
     const mode = process.argv[2] == '-dev' ? 'dev' : 'prod';
 
@@ -730,7 +793,7 @@
     }
 
     function onRequest(context, tokens, query, body) {
-        Object.entries(body).forEach(([k, v]) => {
+        Object.entries(body).forEach(([k,v]) => {
             console.log(`${k} ${v ? 'enabled' : 'disabled'}`);
             context.util[k] = v;
         });
@@ -764,7 +827,7 @@
 
     /**
      * Create storage instance and populate with seed data
-     * @param {Object=}  Associative array with data. Each property is an object with properties in format {key: value}
+     * @param {Object=} seedData Associative array with data. Each property is an object with properties in format {key: value}
      */
     function createInstance(seedData = {}) {
         const collections = new Map();
@@ -839,13 +902,36 @@
         }
 
         /**
-         * Update entry by ID
+         * Replace entry by ID
+         * @param {string} collection Name of collection to access. Throws error if not found.
+         * @param {number|string} id ID of entry to update. Throws error if not found.
+         * @param {Object} data Value to store. Record will be replaced!
+         * @return {Object} Updated entry.
+         */
+        function set(collection, id, data) {
+            if (!collections.has(collection)) {
+                throw new ReferenceError('Collection does not exist: ' + collection);
+            }
+            const targetCollection = collections.get(collection);
+            if (!targetCollection.has(id)) {
+                throw new ReferenceError('Entry does not exist: ' + id);
+            }
+
+            const existing = targetCollection.get(id);
+            const record = assignSystemProps(deepCopy(data), existing);
+            record._updatedOn = Date.now();
+            targetCollection.set(id, record);
+            return Object.assign(deepCopy(record), { _id: id });
+        }
+
+        /**
+         * Modify entry by ID
          * @param {string} collection Name of collection to access. Throws error if not found.
          * @param {number|string} id ID of entry to update. Throws error if not found.
          * @param {Object} data Value to store. Shallow merge will be performed!
          * @return {Object} Updated entry.
          */
-        function set(collection, id, data) {
+         function merge(collection, id, data) {
             if (!collections.has(collection)) {
                 throw new ReferenceError('Collection does not exist: ' + collection);
             }
@@ -919,7 +1005,27 @@
             return result;
         }
 
-        return { get, add, set, delete: del, query };
+        return { get, add, set, merge, delete: del, query };
+    }
+
+
+    function assignSystemProps(target, entry, ...rest) {
+        const whitelist = [
+            '_id',
+            '_createdOn',
+            '_updatedOn',
+            '_ownerId'
+        ];
+        for (let prop of whitelist) {
+            if (entry.hasOwnProperty(prop)) {
+                target[prop] = deepCopy(entry[prop]);
+            }
+        }
+        if (rest.length > 0) {
+            Object.assign(target, ...rest);
+        }
+
+        return target;
     }
 
 
@@ -954,7 +1060,7 @@
 
     var storage = initPlugin;
 
-    const { ConflictError: ConflictError$1, CredentialError: CredentialError$2, RequestError: RequestError$2 } = errors;
+    const { ConflictError: ConflictError$1, CredentialError: CredentialError$1, RequestError: RequestError$2 } = errors;
 
     function initPlugin$1(settings) {
         const identity = settings.identity;
@@ -980,7 +1086,7 @@
                 if (user !== undefined) {
                     context.user = user;
                 } else {
-                    throw new CredentialError$2('Invalid access token');
+                    throw new CredentialError$1('Invalid access token');
                 }
             }
 
@@ -993,10 +1099,10 @@
                 } else if (context.protectedStorage.query('users', { [identity]: body[identity] }).length !== 0) {
                     throw new ConflictError$1(`A user with the same ${identity} already exists`);
                 } else {
-                    const newUser = {
+                    const newUser = Object.assign({}, body, {
                         [identity]: body[identity],
                         hashedPassword: hash(body.password)
-                    };
+                    });
                     const result = context.protectedStorage.add('users', newUser);
                     delete result.hashedPassword;
 
@@ -1019,10 +1125,10 @@
 
                         return result;
                     } else {
-                        throw new CredentialError$2('Email or password don\'t match');
+                        throw new CredentialError$1('Login or password don\'t match');
                     }
                 } else {
-                    throw new CredentialError$2('Email or password don\'t match');
+                    throw new CredentialError$1('Login or password don\'t match');
                 }
             }
 
@@ -1033,7 +1139,7 @@
                         context.protectedStorage.delete('sessions', session._id);
                     }
                 } else {
-                    throw new CredentialError$2('User session does not exist');
+                    throw new CredentialError$1('User session does not exist');
                 }
             }
 
@@ -1077,602 +1183,750 @@
 
     var util$2 = initPlugin$2;
 
+    /*
+     * This plugin requires auth and storage plugins
+     */
+
+    const { RequestError: RequestError$3, ConflictError: ConflictError$2, CredentialError: CredentialError$2, AuthorizationError: AuthorizationError$2 } = errors;
+
+    function initPlugin$3(settings) {
+        const actions = {
+            'GET': '.read',
+            'POST': '.create',
+            'PUT': '.update',
+            'PATCH': '.update',
+            'DELETE': '.delete'
+        };
+        const rules = Object.assign({
+            '*': {
+                '.create': ['User'],
+                '.update': ['Owner'],
+                '.delete': ['Owner']
+            }
+        }, settings.rules);
+
+        return function decorateContext(context, request) {
+            // special rules (evaluated at run-time)
+            const get = (collectionName, id) => {
+                return context.storage.get(collectionName, id);
+            };
+            const isOwner = (user, object) => {
+                return user._id == object._ownerId;
+            };
+            context.rules = {
+                get,
+                isOwner
+            };
+            const isAdmin = request.headers.hasOwnProperty('x-admin');
+
+            context.canAccess = canAccess;
+
+            function canAccess(data, newData) {
+                const user = context.user;
+                const action = actions[request.method];
+                let { rule, propRules } = getRule(action, context.params.collection, data);
+
+                if (Array.isArray(rule)) {
+                    rule = checkRoles(rule, data);
+                } else if (typeof rule == 'string') {
+                    rule = !!(eval(rule));
+                }
+                if (!rule && !isAdmin) {
+                    throw new CredentialError$2();
+                }
+                propRules.map(r => applyPropRule(action, r, user, data, newData));
+            }
+
+            function applyPropRule(action, [prop, rule], user, data, newData) {
+                // NOTE: user needs to be in scope for eval to work on certain rules
+                if (typeof rule == 'string') {
+                    rule = !!eval(rule);
+                }
+
+                if (rule == false) {
+                    if (action == '.create' || action == '.update') {
+                        delete newData[prop];
+                    } else if (action == '.read') {
+                        delete data[prop];
+                    }
+                }
+            }
+
+            function checkRoles(roles, data, newData) {
+                if (roles.includes('Guest')) {
+                    return true;
+                } else if (!context.user && !isAdmin) {
+                    throw new AuthorizationError$2();
+                } else if (roles.includes('User')) {
+                    return true;
+                } else if (context.user && roles.includes('Owner')) {
+                    return context.user._id == data._ownerId;
+                } else {
+                    return false;
+                }
+            }
+        };
+
+
+
+        function getRule(action, collection, data = {}) {
+            let currentRule = ruleOrDefault(true, rules['*'][action]);
+            let propRules = [];
+
+            // Top-level rules for the collection
+            const collectionRules = rules[collection];
+            if (collectionRules !== undefined) {
+                // Top-level rule for the specific action for the collection
+                currentRule = ruleOrDefault(currentRule, collectionRules[action]);
+
+                // Prop rules
+                const allPropRules = collectionRules['*'];
+                if (allPropRules !== undefined) {
+                    propRules = ruleOrDefault(propRules, getPropRule(allPropRules, action));
+                }
+
+                // Rules by record id 
+                const recordRules = collectionRules[data._id];
+                if (recordRules !== undefined) {
+                    currentRule = ruleOrDefault(currentRule, recordRules[action]);
+                    propRules = ruleOrDefault(propRules, getPropRule(recordRules, action));
+                }
+            }
+
+            return {
+                rule: currentRule,
+                propRules
+            };
+        }
+
+        function ruleOrDefault(current, rule) {
+            return (rule === undefined || rule.length === 0) ? current : rule;
+        }
+
+        function getPropRule(record, action) {
+            const props = Object
+                .entries(record)
+                .filter(([k]) => k[0] != '.')
+                .filter(([k, v]) => v.hasOwnProperty(action))
+                .map(([k, v]) => [k, v[action]]);
+
+            return props;
+        }
+    }
+
+    var rules = initPlugin$3;
+
     var identity = "email";
     var protectedData = {
-        users: {
-            "35c62d76-8152-4626-8712-eeb96381bea8": {
-                firstName: "Peter",
-                lastName: "Ivanov",
-                username: "peter",
-                address: "Varna",
-                email: "peter@abv.bg",
-                hashedPassword: "83313014ed3e2391aa1332615d2f053cf5c1bfe05ca1cbcb5582443822df6eb1"
-            },
-            "847ec027-f659-4086-8032-5173e2f9c93a": {
-                firstName: "George",
-                lastName: "Petkov",
-                username: "george",
-                address: "Sofia",
-                email: "george@abv.bg",
-                hashedPassword: "83313014ed3e2391aa1332615d2f053cf5c1bfe05ca1cbcb5582443822df6eb1"
-            },
-            "60f0cf0b-34b0-4abd-9769-8c42f830dffc": {
-                firstName: "Admin",
-                lastName: "Adinov",
-                username: "admin",
-                address: "Plovdiv",
-                email: "admin@abv.bg",
-                hashedPassword: "fac7060c3e17e6f151f247eacb2cd5ae80b8c36aedb8764e18a41bbdc16aa302"
-            }
-        },
-        sessions: {
-        }
+    	users: {
+    		"35c62d76-8152-4626-8712-eeb96381bea8": {
+    			firstName: "Peter",
+    			lastName: "Ivanov",
+    			username: "peter",
+    			address: "Varna",
+    			email: "peter@abv.bg",
+    			hashedPassword: "83313014ed3e2391aa1332615d2f053cf5c1bfe05ca1cbcb5582443822df6eb1"
+    		},
+    		"847ec027-f659-4086-8032-5173e2f9c93a": {
+    			firstName: "George",
+    			lastName: "Petkov",
+    			username: "george",
+    			address: "Sofia",
+    			email: "george@abv.bg",
+    			hashedPassword: "83313014ed3e2391aa1332615d2f053cf5c1bfe05ca1cbcb5582443822df6eb1"
+    		},
+    		"60f0cf0b-34b0-4abd-9769-8c42f830dffc": {
+    			firstName: "Admin",
+    			lastName: "Adinov",
+    			username: "admin",
+    			address: "Plovdiv",
+    			email: "admin@abv.bg",
+    			hashedPassword: "fac7060c3e17e6f151f247eacb2cd5ae80b8c36aedb8764e18a41bbdc16aa302"
+    		}
+    	},
+    	sessions: {
+    	}
     };
     var seedData = {
-        manga: {
-            "ff35152b-aceb-4f5f-b0ed-503ff26caabf": {
-                _id: "ff35152b-aceb-4f5f-b0ed-503ff26caabf",
-                _createdOn: 1701443936660,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81s8xJUzWGL._SY466_.jpg",
-                name: "Chainsaw Man",
-                volume: "1",
-                price: 7.19,
-                author: "Tatsuki Fujimoto",
-                genre: "action",
-                status: "ongoing",
-                pages: 192,
-                language: "English",
-                synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! Denji's a poor young man who'll do anything for money, even hunting down devils with his pet devil Pochita. He's a simple man with simple dreams, drowning under a mountain of debt. But his sad life gets turned upside down one day when he's betrayed by someone he trusts. Now with the power of a devil inside him, Denji's become a whole new man—Chainsaw Man!"
-            },
-            "c5326bcc-6c4c-4e41-9768-333bf894267a": {
-                _id: "c5326bcc-6c4c-4e41-9768-333bf894267a",
-                _createdOn: 1701444738411,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/513xaEKX-aL._SY445_SX342_.jpg",
-                name: "Chainsaw Man",
-                volume: "3",
-                price: 6.65,
-                author: "Tatsuki Fujimoto",
-                genre: "action",
-                status: "ongoing",
-                pages: 192,
-                language: "English",
-                synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! A mysterious devil is demanding Denji's heart! But will the devil hunters from Division 4 agree to this deal to save themselves? Or will Denji have to do what Denji does best—turn into a chainsaw and carve up everything that gets in his way?!"
-            },
-            "89632330-42a7-43e0-9403-86b720343ffe": {
-                _id: "89632330-42a7-43e0-9403-86b720343ffe",
-                _createdOn: 1701444881902,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/51F5K1HjseL._SY445_SX342_.jpg",
-                name: "Chainsaw Man",
-                volume: "4",
-                price: 7.99,
-                author: "Tatsuki Fujimoto",
-                genre: "action",
-                status: "ongoing",
-                pages: 192,
-                language: "English",
-                synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! Devil Extermination Special Division 4 is in serious trouble as a devil has sent a whole team of assassins to take Denji's heart. In order to survive the onslaught, Denji, Power and Aki will have to get stronger. But is Denji smart enough to learn how to control his devil powers? Can you can teach an old chainsaw-dog-devil new tricks?"
-            },
-            "075f31f7-cc7f-4f1f-bae8-d6fc1bd09ce4": {
-                _id: "075f31f7-cc7f-4f1f-bae8-d6fc1bd09ce4",
-                _createdOn: 1701445079981,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81fAfyWEEiL._SY466_.jpg",
-                name: "D.Gray-man",
-                volume: "1, 2, 3",
-                price: 14.70,
-                author: "Katsura Hoshino",
-                genre: "action",
-                status: "ongoing",
-                pages: 576,
-                language: "English",
-                synopsis: "D.Gray-man is the story of Allen Walker, who roams a fictional 19th century Earth in search of Innocence, a mysterious substance used to fight demons called akuma. Allen Walker travels to the headquarters of the Black Order, a group of exorcists out to destroy the Millennium Earl, the creator of the akuma. Allen is already a strong exorcist and wants to join the Black Order, but he might not even survive getting past the guard!"
-            },
-            "ab74501b-743e-491b-a965-f4d83014e894": {
-                _id: "ab74501b-743e-491b-a965-f4d83014e894",
-                _createdOn: 1701445145047,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81M+KORBw9L._SY466_.jpg",
-                name: "D.Gray-man",
-                volume: "26",
-                price: 9.99,
-                author: "Katsura Hoshino",
-                genre: "action",
-                status: "ongoing",
-                pages: 200,
-                language: "English",
-                synopsis: "Set in a fictional 19th century England, D.Gray-man is the story of Allen Walker, a 15-year-old boy who roams the earth in search of Innocence. Washed away to unknown parts of the world after The Great Flood, Innocence is the mysterious substance used to create weapons that obliterate demons known as akuma. Allen has long been host to Nea, a dangerous entity also known as the Fourteenth. Nea was dormant, but he's since roused and is now dominant. Johnny, Allen's most stalwart ally, tries to restore Allen to consciousness, but can he manage it in time?"
-            },
-            "93aa2cec-193f-44f4-99cc-72c315a564a5": {
-                _id: "93aa2cec-193f-44f4-99cc-72c315a564a5",
-                _createdOn: 1701445270766,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81wC++rSTPL._SY466_.jpg",
-                name: "Yona of the Dawn",
-                volume: "1",
-                price: 9.49,
-                author: "Mizuho Kusanagi",
-                genre: "romance",
-                status: "ongoing",
-                pages: 200,
-                language: "English",
-                synopsis: "Princess Yona lives an ideal life as the only princess of her kingdom. Doted on by her father, the king, and protected by her faithful guard Hak, she cherishes the time spent with the man she loves, Su-won. But everything changes on her 16th birthday when tragedy strikes her family! Yona reels from the shock of witnessing a loved one's murder and having to fight for her life. With Hak's help, she flees the palace and struggles to survive while evading her enemy's forces. But where will this displaced princess go when all the paths before her are uncertain?"
-            },
-            "e6154fe4-c6f8-45d0-a04d-df792b8c0d5c": {
-                _id: "e6154fe4-c6f8-45d0-a04d-df792b8c0d5c",
-                _createdOn: 1701445333176,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81BORSK0fSL._SY466_.jpg",
-                name: "Yona of the Dawn",
-                volume: "2",
-                price: 9.49,
-                author: "Mizuho Kusanagi",
-                genre: "romance",
-                status: "ongoing",
-                pages: 192,
-                language: "English",
-                synopsis: "Princess Yona lives an ideal life as the only princess of her kingdom. Doted on by her father, the king, and protected by her faithful guard Hak, she cherishes the time spent with the man she loves, Su-won. But everything changes on her 16th birthday when tragedy strikes her family! While on the run, Yona and Hak head to Hak's hometown, where she attempts to heal her broken heart. However, she can't rest there for long once she discovers that Su-won may soon become king! What will Yona choose to do in the wake of this news?"
-            },
-            "25db9603-253e-4eec-8962-24c62654d744": {
-                _id: "25db9603-253e-4eec-8962-24c62654d744",
-                _createdOn: 1701445333176,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81GIb6GMhRL._SY466_.jpg",
-                name: "The Promised Neverland",
-                volume: "1",
-                price: 6.10,
-                author: "Kaiu Shirai",
-                genre: "mystery",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Life at Grace Field House is good for Emma and her fellow orphans. While the daily studying and exams they have to take are tough, their loving caretaker provides them with delicious food and plenty of playtime. But perhaps not everything is as it seems… Emma, Norman and Ray are the brightest kids at the Grace Field House orphanage. And under the care of the woman they refer to as “Mom,” all the kids have enjoyed a comfortable life. Good food, clean clothes and the perfect environment to learn—what more could an orphan ask for? One day, though, Emma and Norman uncover the dark truth of the outside world they are forbidden from seeing."
-            },
-            "8e95357b-9ee8-46be-8ef3-deed1ddc862c": {
-                _id: "8e95357b-9ee8-46be-8ef3-deed1ddc862c",
-                _createdOn: 1701445333176,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81atHQymv+L._SY466_.jpg",
-                name: "The Promised Neverland",
-                volume: "3",
-                price: 6.10,
-                author: "Kaiu Shirai",
-                genre: "mystery",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Life at Grace Field House is good for Emma and her fellow orphans. While the daily studying and exams they have to take are tough, their loving caretaker provides them with delicious food and plenty of playtime. But perhaps not everything is as it seems… In order to escape the orphanage where they are being raised as food for demons, Emma, Norman and Ray begin recruiting allies. But convincing the other children to believe them may not be an easy task."
-            },
-            "09ba98bc-022b-4a9d-8963-fca6cf6a733f": {
-                _id: "09ba98bc-022b-4a9d-8963-fca6cf6a733f",
-                _createdOn: 1701445508624,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/912y5oJyJLL._SY466_.jpg",
-                name: "Black Butler",
-                volume: "14",
-                price: 13.00,
-                author: "Yana Toboso",
-                genre: "mystery",
-                status: "ongoing",
-                pages: 178,
-                language: "English",
-                synopsis: "The veil of mystery cast over the Aurora Society's 'absolute salvation' is torn away, and the true mastermind behind the scheme steps forward at long last. In the ensuing battle, Earl Ciel Phantomhive looks on in horror as Sebastian, his infallible manservant, is struck down by the death scythe of an unforeseen combatant. Devil though he may be, even Sebastian is not immune to the blade of a reaper's scythe. As Sebastian's cinematic record spills forth, the tale of how a devil became a butler to a little lost lord flickers to life in shades of sepia, blood, and ash..."
-            },
-            "401e86ef-6385-4bab-8221-5702676d9b01": {
-                _id: "401e86ef-6385-4bab-8221-5702676d9b01",
-                _createdOn: 1701445566130,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/517mzKOIdXL._SY445_SX342_.jpg",
-                name: "Black Butler",
-                volume: "31",
-                price: 13.00,
-                author: "Yana Toboso",
-                genre: "mystery",
-                status: "ongoing",
-                pages: 178,
-                language: "English",
-                synopsis: "Mey-Rin and Ran-Mao's victory is secured as they thoroughly dismantle the operation in North Yorkshire. Meanwhile, Baldo and Lau are headed to Wiltshire to investigate a sanatorium for war veterans that is rumored to be headed by a “miracle healer.” The skeptical cook is disinclined to believe in the existence of angels―but the incredulous sight that unfolds before his eyes might change his mind…"
-            },
-            "dc7e6b97-de37-4324-be4b-79ee3253bdbd": {
-                _id: "dc7e6b97-de37-4324-be4b-79ee3253bdbd",
-                _createdOn: 1701445696184,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/51IrW578SQL._SY445_SX342_.jpg",
-                name: "Berserk Deluxe",
-                volume: "1",
-                price: 50.00,
-                author: "Kentaro Miura",
-                genre: "horror",
-                status: "ongoing",
-                pages: 696,
-                language: "English",
-                synopsis: "Guts, a former mercenary now known as the 'Black Swordsman', is out for revenge. After a tumultuous childhood, he finally finds someone he respects and believes he can trust, only to have everything fall apart when this person takes away everything important to Guts for the purpose of fulfilling his own desires. Now marked for death, Guts becomes condemned to a fate in which he is relentlessly pursued by demonic beings. Setting out on a dreadful quest riddled with misfortune, Guts, armed with a massive sword and monstrous strength, will let nothing stop him, not even death itself, until he is finally able to take the head of the one who stripped him—and his loved one—of their humanity."
-            },
-            "2a90d959-350d-4a78-bd82-42ef54a36f65": {
-                _id: "2a90d959-350d-4a78-bd82-42ef54a36f65",
-                _createdOn: 1701445750889,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81gv-D-LqhL._SY466_.jpg",
-                name: "Tokyo Ghoul",
-                volume: "1",
-                price: 9.99,
-                author: "Sui Ishida",
-                genre: "horror",
-                status: "completed",
-                pages: 224,
-                language: "English",
-                synopsis: "Ghouls live among us, the same as normal people in every way—except their craving for human flesh. Ken Kaneki is an ordinary college student until a violent encounter turns him into the first half-human half-ghoul hybrid. Trapped between two worlds, he must survive Ghoul turf wars, learn more about Ghoul society and master his new powers. Shy Ken Kaneki is thrilled to go on a date with the beautiful Rize. But it turns out that she's only interested in his body—eating it, that is. When a morally questionable rescue transforms him into the first half-human half-Ghoul hybrid, Ken is drawn into the dark and violent world of Ghouls, which exists alongside our own."
-            },
-            "d922bc54-7c1b-4726-a498-6ef1f180dd0c": {
-                _id: "d922bc54-7c1b-4726-a498-6ef1f180dd0c",
-                _createdOn: 1701445808185,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/61dmrRwKh1L._SY466_.jpg",
-                name: "Tokyo Ghoul: re",
-                volume: "1",
-                price: 9.99,
-                author: "Sui Ishida",
-                genre: "horror",
-                status: "completed",
-                pages: 216,
-                language: "English",
-                synopsis: "The Commission of Counter Ghoul is the only organization fighting the Ghoul menace, and they will use every tool at their disposal to protect humanity from its ultimate predator. Their newest weapon in this hidden war is an experimental procedure that implants human investigators with a Ghoul's Kagune, giving them Ghoul powers and abilities. But both the procedure and the newly formed Qs Squad are untested. Will they become heroes…or monsters?! Haise Sasaki has been tasked with teaching Qs Squad how to be outstanding investigators, but his assignment is complicated by the troublesome personalities of his students and his own uncertain grasp of his Ghoul powers. Can he pull them together as a team, or will Qs Squad first assignment be their last?"
-            },
-            "5706a74f-c5d8-4be5-b443-9e46ec7883cc": {
-                _id: "5706a74f-c5d8-4be5-b443-9e46ec7883cc",
-                _createdOn: 1701445901538,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81qip4V12SL._SY466_.jpg",
-                name: "Horimiya",
-                volume: "1",
-                price: 9.11,
-                author: "HERO",
-                genre: "romance",
-                status: "completed",
-                pages: 176,
-                language: "English",
-                synopsis: "At school, Kyouko Hori is known for being smart, attractive, and popular. On the other hand, her classmate, the boring, gloomy Izumi Miyamura tends to get painted as a 'loser fanboy'. But when a liberally pierced and tattooed (not to mention downright gorgeous) Miyamura appears unexpectedly on the doorstep of secretly plain-Jane homebody Hori, these two similarly dissimilar teenagers discover that there are multiple sides to every story...and person!"
-            },
-            "daac9329-c7d5-4545-a886-e6094f2c576c": {
-                _id: "daac9329-c7d5-4545-a886-e6094f2c576c",
-                _createdOn: 1701445990353,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/51pyc5sYK7L._SY445_SX342_.jpg",
-                name: "Horimiya",
-                volume: "2",
-                price: 9.11,
-                author: "HERO",
-                genre: "romance",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "By all appearances, Kyouko Hori and Izumi Miyamura are worlds apart. Bright and capable, Hori is always surrounded by classmates, the center of attention. For Miyamura, a quirky loner, getting through class unnoticed counts as a good day. But ever since these two started sharing secrets, they've found themselves drawn into each other's orbit little by little and the distance between them shrinking bit by bit..."
-            },
-            "d3e58f90-12fc-470d-a9de-d719fa7b7715": {
-                _id: "d3e58f90-12fc-470d-a9de-d719fa7b7715",
-                _createdOn: 1701446089892,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81k6fYmHN6L._SY466_.jpg",
-                name: "The Quintessential Quintuplets",
-                volume: "1",
-                price: 10.99,
-                author: "Negi Haruba",
-                genre: "romance",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Five girls who want to do anything but study, and their tutor: A high school boy who's got book smarts and not much else. Futaro Uesugi took the tutoring gig because he was desperate for cash, but when his students--the five beautiful daughters of a wealthy businessman--find five times the excuses to slack off, what can he do?! At this rate, the sisters won't graduate, so if he wants to get paid, Futaro must think of a plan to suit each of them... Which feels hopeless when five out of five of them think he's a loser!"
-            },
-            "9c830ba8-f007-4618-8d58-681d1a8f0c04": {
-                _id: "9c830ba8-f007-4618-8d58-681d1a8f0c04",
-                _createdOn: 1701446158947,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81JCbXEyYKL._SY466_.jpg",
-                name: "The Quintessential Quintuplets",
-                volume: "4",
-                price: 10.99,
-                author: "Negi Haruba",
-                genre: "romance",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Futaro continues to lead the Quints to academic aptitude, but there are some treats in store for him as well! Having nearly missed his long-awaited school trip, Futaro tries to make the best of the situation and works on getting closer to all five girls. After getting a tip from one of the sisters, Futaro takes a different approach to getting the girls interested in their studies. Will they accept him into their lives...? Or will this really be the end of his short tutoring career?"
-            },
-            "037d18a7-e35a-4fef-91f2-49ed1f261091": {
-                _id: "037d18a7-e35a-4fef-91f2-49ed1f261091",
-                _createdOn: 1701446216446,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/8125DI58M+L._SY466_.jpg",
-                name: "Haikyu!!",
-                volume: "1",
-                price: 5.99,
-                author: "Haruichi Furudate",
-                genre: "sports",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? After losing his first and last volleyball match against Tobio Kageyama, “the King of the Court,” Shoyo Hinata swears to become his rival after graduating middle school. But what happens when the guy he wants to defeat ends up being his teammate?!"
-            },
-            "38e6fcea-a1bf-4d42-b1c0-c1fb76709d75": {
-                _id: "38e6fcea-a1bf-4d42-b1c0-c1fb76709d75",
-                _createdOn: 1701446271272,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/51lDTDxNgiL._SY445_SX342_.jpg",
-                name: "Haikyu!!",
-                volume: "4",
-                price: 5.99,
-                author: "Haruichi Furudate",
-                genre: "sports",
-                status: "completed",
-                pages: 216,
-                language: "English",
-                synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? The training camp kicks off with a bang! Hinata and his teammates train their hearts out in preparation for the practice game against Nekoma, but they'll need to polish their receiving skills if they want to win. After all their hard work, the moment they've all been waiting for finally arrives—the revival of the long-standing rivalry between the Cats and the Crows! And Nekoma's starting setter looks vaguely familiar…"
-            },
-            "ee08a6f2-4e09-4fdc-bb58-33f2efa5b6a2": {
-                _id: "ee08a6f2-4e09-4fdc-bb58-33f2efa5b6a2",
-                _createdOn: 1701446336146,
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                imageUrl: "https://m.media-amazon.com/images/I/81uROkePvYL._SY466_.jpg",
-                name: "Haikyu!!",
-                volume: "44",
-                price: 5.99,
-                author: "Haruichi Furudate",
-                genre: "sports",
-                status: "completed",
-                pages: 192,
-                language: "English",
-                synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? Hinata and Kageyama finally meet again, this time in the V.League. Even amid the high-level plays between the top-tier Adlers and Black Jackals, Hinata shows off all that he can do and makes big waves on the court! Once again facing Hinata as an opponent, Kageyama watches him with growing excitement as he navigates the court."
-            },
-            "59009b3d-2ff5-4d18-9474-c235082423c4": {
-                _id: "59009b3d-2ff5-4d18-9474-c235082423c4",
-                _createdOn: 1701446484133,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/71Ov8pDg16L._SY466_.jpg",
-                name: "Blue Lock",
-                volume: "9",
-                price: 10.99,
-                author: "Muneyuki Kaneshiro",
-                genre: "sports",
-                status: "ongoing",
-                pages: 208,
-                language: "English",
-                synopsis: "Thanks to Barou's awakening, Isagi's team manages to defeat the trio of Kunigami, Chigiri, and Reo. And the one that Isagi chooses to steal is... The new four-man team sets out for a rematch against the Top Three and Bachira. Will the 'monster' that fuels Isagi's ego be enough to take down the prodigy striker Rin Itoshi?!"
-            },
-            "3d2f63ae-d9de-4f82-ba6f-aee5c0b680cb": {
-                _id: "3d2f63ae-d9de-4f82-ba6f-aee5c0b680cb",
-                _createdOn: 1701446598598,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/81W9TXFd6xL._SY466_.jpg",
-                name: "Blue Lock",
-                volume: "5",
-                price: 10.99,
-                author: "Muneyuki Kaneshiro",
-                genre: "sports",
-                status: "ongoing",
-                pages: 208,
-                language: "English",
-                synopsis: "In the face of Team V, Team Z has managed to catch up 3-3 with fifteen minutes remaining. Amid this tense environment, all the players seek their 'awakening' that will take their skills to the next level... Will they manage to beat Team V and qualify for the next selection--or will they be stuck on the playing field with nowhere to go?"
-            },
-            "a6b66221-b57d-4595-ada7-7dbf0d6d48b6": {
-                _id: "a6b66221-b57d-4595-ada7-7dbf0d6d48b6",
-                _createdOn: 1701446678899,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/514l+Y9eApL._SY445_SX342_.jpg",
-                name: "Blue Lock",
-                volume: "2",
-                price: 10.99,
-                author: "Muneyuki Kaneshiro",
-                genre: "sports",
-                status: "ongoing",
-                pages: 208,
-                language: "English",
-                synopsis: "Yoichi Isagi, one of three hundred high school soccer players is in Team Z--the lowest ranked group in the controversial training facility, Blue Lock, where the aim is to create Japan's best striker. To survive their first round-robin tournament, Isagi's Team Z will need to find a way to use their unique 'weapons', while struggling through a clash of egos. But Isagi grapples to understand what his strength is as a striker..."
-            },
-            "c6a10d0d-4ac0-40e8-80a9-46d5235777d5": {
-                _id: "c6a10d0d-4ac0-40e8-80a9-46d5235777d5",
-                _createdOn: 1701446745566,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/81CeGGwz+BL._SY466_.jpg",
-                name: "Uzumaki",
-                volume: "1, 2, 3",
-                price: 33.99,
-                author: "Junji Ito",
-                genre: "horror",
-                status: "completed",
-                pages: 648,
-                language: "English",
-                synopsis: "Kurouzu-cho, a small fogbound town on the coast of Japan, is cursed. According to Shuichi Saito, the withdrawn boyfriend of teenager Kirie Goshima, their town is haunted not by a person or being but a pattern: UZUMAKI, the spiral—the hypnotic secret shape of the world. The bizarre masterpiece horror manga is now available all in a single volume. Fall into a whirlpool of terror!"
-            },
-            "ddb1c067-5314-4ffb-91d0-54572967f45e": {
-                _id: "ddb1c067-5314-4ffb-91d0-54572967f45e",
-                _createdOn: 1701446935390,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/91-um1ueRqL._SY466_.jpg",
-                name: "Dorohedoro",
-                volume: "1",
-                price: 12.59,
-                author: "Q Hayashida",
-                genre: "comedy",
-                status: "completed",
-                pages: 176,
-                language: "English",
-                synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers have been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds."
-            },
-            "39f33d15-281d-40d6-9997-353dea766c4e": {
-                _id: "39f33d15-281d-40d6-9997-353dea766c4e",
-                _createdOn: 1701447002398,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/81RUuav+oxL._SY466_.jpg",
-                name: "Dorohedoro",
-                volume: "2",
-                price: 12.59,
-                author: "Q Hayashida",
-                genre: "comedy",
-                status: "completed",
-                pages: 160,
-                language: "English",
-                synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers has been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds. Once a year, hordes of the dead rise and roam the streets of the Hole, hungry for live flesh. And every year, Caiman and Nikaido sign up for the local zombie-killing contest! Whoever sends the most zombies back into the ground will win some fantastic prizes. But the fun ends quickly when En's cleaners finally track down Caiman and Nikaido. Somebody's going to lose their head. Literally."
-            },
-            "442c0bef-d7fa-4293-991d-694f11ed7168": {
-                _id: "442c0bef-d7fa-4293-991d-694f11ed7168",
-                _createdOn: 1701447078137,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/616nT3lazIL._SY466_.jpg",
-                name: "Dorohedoro",
-                volume: "3",
-                price: 12.59,
-                author: "Q Hayashida",
-                genre: "comedy",
-                status: "completed",
-                pages: 176,
-                language: "English",
-                synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers has been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds. While En seeks out a new partner with unique magic powers, his crew has a run-in with an underground organization that controls the distribution of 'black powder', a magic-enhancing drug used by weaker Sorcerers. Meanwhile, Caiman and Nikaido spend New Year's in the haunted mansion of a mysterious doctor who specializes in the anatomy of Sorcerers. The doctor reveals to them the only known portal to the Sorcerers' dimension..."
-            },
-            "a06de3f4-5618-4e96-a56c-3f9b6bc495db": {
-                _id: "a06de3f4-5618-4e96-a56c-3f9b6bc495db",
-                _createdOn: 1701447143078,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/91toFx95GzL._SY466_.jpg",
-                name: "Ajin",
-                volume: "2",
-                price: 11.99,
-                author: "Gamon Sakurai",
-                genre: "horror",
-                status: "completed",
-                pages: 200,
-                language: "English",
-                synopsis: "A bright high schooler has discovered to his horror that death is just a repeatable event for him - and that humanity has no mercy for a demi-human. To avoid becoming a science experiment for the rest of his interminable life, Kei Nagai must seek out others of his kind. But what would a community of them stand for?"
-            },
-            "12046ffb-2d92-488c-bea7-de305d34605b": {
-                _id: "12046ffb-2d92-488c-bea7-de305d34605b",
-                _createdOn: 1701447193013,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/719AXHRvCiL._SY466_.jpg",
-                name: "Ajin",
-                volume: "3",
-                price: 11.99,
-                author: "Gamon Sakurai",
-                genre: "horror",
-                status: "completed",
-                pages: 194,
-                language: "English",
-                synopsis: "The true aim of the raid on the research center is revealed by demi-human mastermind Sato, whose Bolshevik ruthlessness and cunning prove worthy of his choice of headgear."
-            },
-            "10a339cf-fcea-4d3e-893f-6a5fb19420d0": {
-                _id: "10a339cf-fcea-4d3e-893f-6a5fb19420d0",
-                _createdOn: 1701447243121,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/81VAgJoB3BL._SY466_.jpg",
-                name: "One Punch Man",
-                volume: "1",
-                price: 9.99,
-                author: "ONE",
-                genre: "comedy",
-                status: "ongoing",
-                pages: 200,
-                language: "English",
-                synopsis: "Nothing about Saitama passes the eyeball test when it comes to superheroes, from his lifeless expression to his bald head to his unimpressive physique. However, this average-looking guy has a not-so-average problem—he just can't seem to find an opponent strong enough to take on! Every time a promising villain appears, Saitama beats the snot out of 'em with one punch! Can he finally find an opponent who can go toe-to-toe with him and give his life some meaning? Or is he doomed to a life of superpowered boredom?"
-            },
-            "a7147d5b-3046-45a0-ad4e-6c69a7a66c3d": {
-                _id: "a7147d5b-3046-45a0-ad4e-6c69a7a66c3d",
-                _createdOn: 1701447298854,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/810RdR69pBL._SY466_.jpg",
-                name: "One Punch Man",
-                volume: "2",
-                price: 9.99,
-                author: "ONE",
-                genre: "comedy",
-                status: "ongoing",
-                pages: 200,
-                language: "English",
-                synopsis: "Nothing about Saitama passes the eyeball test when it comes to superheroes, from his lifeless expression to his bald head to his unimpressive physique. However, this average-looking guy has a not-so-average problem—he just can't seem to find an opponent strong enough to take on! Saitama's easily taken out a number of monsters, including a crabby creature, a malicious mosquito girl and a muscly meathead. But his humdrum life takes a drastic turn when he meets Genos—a cyborg who wants to uncover the secret behind his strength!"
-            },
-            "6cc6b6e3-031a-486f-8850-d2e81ee31901": {
-                _id: "6cc6b6e3-031a-486f-8850-d2e81ee31901",
-                _createdOn: 1701447360221,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/71vMGRog+iL._SY466_.jpg",
-                name: "Spy x Family",
-                volume: "1",
-                price: 6.99,
-                author: "Tatsuya Endo",
-                genre: "comedy",
-                status: "ongoing",
-                pages: 220,
-                language: "English",
-                synopsis: "Master spy Twilight is unparalleled when it comes to going undercover on dangerous missions for the betterment of the world. But when he receives the ultimate assignment—to get married and have a kid—he may finally be in over his head! Not one to depend on others, Twilight has his work cut out for him procuring both a wife and a child for his mission to infiltrate an elite private school. What he doesn't know is that the wife he's chosen is an assassin and the child he's adopted is a telepath!"
-            },
-            "f3a6b495-8bfd-49c3-af3b-9b705994ec68": {
-                _id: "f3a6b495-8bfd-49c3-af3b-9b705994ec68",
-                _createdOn: 1701447509714,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/61iyxqz5ZhL._SY466_.jpg",
-                name: "Vagabond",
-                volume: "1",
-                price: 24.99,
-                author: "Takehiko Inoue",
-                genre: "action",
-                status: "hiatus",
-                pages: 600,
-                language: "English",
-                synopsis: "At seventeen years of age, Miyamoto Musashi--still known by his childhood name, Shinmen Takezō--was a wild young brute just setting out along the way of the sword. In the aftermath of the epic Battle of Sekigahara, Takezō finds himself a fugitive survivor on the losing side of the war. Takezō's vicious nature has made him an outcast even in his own village, and he is hunted down like an animal. At this crucial crossroads in Takezō's life, an eccentric monk and a childhood friend are the only ones who can help him find his way."
-            },
-            "7c742f49-61fd-466c-8185-db8a918e3a3a": {
-                _id: "7c742f49-61fd-466c-8185-db8a918e3a3a",
-                _createdOn: 1701447562494,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/71y+XnBXm4L._SY466_.jpg",
-                name: "One Piece",
-                volume: "1",
-                price: 9.99,
-                author: "Eiichiro Oda",
-                genre: "action",
-                status: "ongoing",
-                pages: 216,
-                language: "English",
-                synopsis: "As a child, Monkey D. Luffy dreamed of becoming King of the Pirates. But his life changed when he accidentally gained the power to stretch like rubber…at the cost of never being able to swim again! Years, later, Luffy sets off in search of the “One Piece,” said to be the greatest treasure in the world... As a child, Monkey D. Luffy was inspired to become a pirate by listening to the tales of the buccaneer 'Red-Haired' Shanks. But his life changed when Luffy accidentally ate the Gum-Gum Devil Fruit and gained the power to stretch like rubber...at the cost of never being able to swim again! Years later, still vowing to become the king of the pirates, Luffy sets out on his adventure...one guy alone in a rowboat, in search of the legendary 'One Piece', said to be the greatest treasure in the world..."
-            },
-            "d184c493-48a4-4006-9dab-fba1341e7e64": {
-                _id: "d184c493-48a4-4006-9dab-fba1341e7e64",
-                _createdOn: 1701447617883,
-                _ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
-                imageUrl: "https://m.media-amazon.com/images/I/A1F6J2dBalL._SY466_.jpg",
-                name: "One Piece",
-                volume: "52",
-                price: 9.99,
-                author: "Eiichiro Oda",
-                genre: "action",
-                status: "ongoing",
-                pages: 216,
-                language: "English",
-                synopsis: "In his effort to save Camie the mermaid from being sold to the highest bidder, Luffy's attack on an exalted Celestial Dragon has given the Navy the green light to send the Admirals in after him. But the Straw Hats get help from an unexpected source--a mysterious outlaw who knows all about Gold Roger, the original King of the Pirates!"
-            }
-        },
-        comments: {
-            "0a272c58-b7ea-4e09-a000-7ec988248f66": {
-                _ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
-                content: "Great recipe!",
-                recipeId: "8f414b4f-ab39-4d36-bedb-2ad69da9c830",
-                _createdOn: 1614260681375,
-                _id: "0a272c58-b7ea-4e09-a000-7ec988248f66"
-            }
-        },
-        likes: {
-        }
+    	comments: {
+    	},
+    	manga: {
+    		"ff35152b-aceb-4f5f-b0ed-503ff26caabf": {
+    			_id: "ff35152b-aceb-4f5f-b0ed-503ff26caabf",
+    			_createdOn: 1701443936660,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81s8xJUzWGL._SY466_.jpg",
+    			name: "Chainsaw Man",
+    			volume: "1",
+    			price: 7.19,
+    			author: "Tatsuki Fujimoto",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! Denji's a poor young man who'll do anything for money, even hunting down devils with his pet devil Pochita. He's a simple man with simple dreams, drowning under a mountain of debt. But his sad life gets turned upside down one day when he's betrayed by someone he trusts. Now with the power of a devil inside him, Denji's become a whole new man—Chainsaw Man!"
+    		},
+    		"c5326bcc-6c4c-4e41-9768-333bf894267a": {
+    			_id: "c5326bcc-6c4c-4e41-9768-333bf894267a",
+    			_createdOn: 1701444738411,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/513xaEKX-aL._SY445_SX342_.jpg",
+    			name: "Chainsaw Man",
+    			volume: "3",
+    			price: 6.65,
+    			author: "Tatsuki Fujimoto",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! A mysterious devil is demanding Denji's heart! But will the devil hunters from Division 4 agree to this deal to save themselves? Or will Denji have to do what Denji does best—turn into a chainsaw and carve up everything that gets in his way?!"
+    		},
+    		"89632330-42a7-43e0-9403-86b720343ffe": {
+    			_id: "89632330-42a7-43e0-9403-86b720343ffe",
+    			_createdOn: 1701444881902,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/51F5K1HjseL._SY445_SX342_.jpg",
+    			name: "Chainsaw Man",
+    			volume: "4",
+    			price: 7.99,
+    			author: "Tatsuki Fujimoto",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Denji was a small-time devil hunter just trying to survive in a harsh world. After being killed on a job, he is revived by his pet devil Pochita and becomes something new and dangerous—Chainsaw Man! Devil Extermination Special Division 4 is in serious trouble as a devil has sent a whole team of assassins to take Denji's heart. In order to survive the onslaught, Denji, Power and Aki will have to get stronger. But is Denji smart enough to learn how to control his devil powers? Can you can teach an old chainsaw-dog-devil new tricks?"
+    		},
+    		"075f31f7-cc7f-4f1f-bae8-d6fc1bd09ce4": {
+    			_id: "075f31f7-cc7f-4f1f-bae8-d6fc1bd09ce4",
+    			_createdOn: 1701445079981,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81fAfyWEEiL._SY466_.jpg",
+    			name: "D.Gray-man",
+    			volume: "1, 2, 3",
+    			price: 14.7,
+    			author: "Katsura Hoshino",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 576,
+    			language: "English",
+    			synopsis: "D.Gray-man is the story of Allen Walker, who roams a fictional 19th century Earth in search of Innocence, a mysterious substance used to fight demons called akuma. Allen Walker travels to the headquarters of the Black Order, a group of exorcists out to destroy the Millennium Earl, the creator of the akuma. Allen is already a strong exorcist and wants to join the Black Order, but he might not even survive getting past the guard!"
+    		},
+    		"ab74501b-743e-491b-a965-f4d83014e894": {
+    			_id: "ab74501b-743e-491b-a965-f4d83014e894",
+    			_createdOn: 1701445145047,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81M+KORBw9L._SY466_.jpg",
+    			name: "D.Gray-man",
+    			volume: "26",
+    			price: 9.99,
+    			author: "Katsura Hoshino",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 200,
+    			language: "English",
+    			synopsis: "Set in a fictional 19th century England, D.Gray-man is the story of Allen Walker, a 15-year-old boy who roams the earth in search of Innocence. Washed away to unknown parts of the world after The Great Flood, Innocence is the mysterious substance used to create weapons that obliterate demons known as akuma. Allen has long been host to Nea, a dangerous entity also known as the Fourteenth. Nea was dormant, but he's since roused and is now dominant. Johnny, Allen's most stalwart ally, tries to restore Allen to consciousness, but can he manage it in time?"
+    		},
+    		"93aa2cec-193f-44f4-99cc-72c315a564a5": {
+    			_id: "93aa2cec-193f-44f4-99cc-72c315a564a5",
+    			_createdOn: 1701445270766,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81wC++rSTPL._SY466_.jpg",
+    			name: "Yona of the Dawn",
+    			volume: "1",
+    			price: 9.49,
+    			author: "Mizuho Kusanagi",
+    			genre: "romance",
+    			status: "ongoing",
+    			pages: 200,
+    			language: "English",
+    			synopsis: "Princess Yona lives an ideal life as the only princess of her kingdom. Doted on by her father, the king, and protected by her faithful guard Hak, she cherishes the time spent with the man she loves, Su-won. But everything changes on her 16th birthday when tragedy strikes her family! Yona reels from the shock of witnessing a loved one's murder and having to fight for her life. With Hak's help, she flees the palace and struggles to survive while evading her enemy's forces. But where will this displaced princess go when all the paths before her are uncertain?"
+    		},
+    		"e6154fe4-c6f8-45d0-a04d-df792b8c0d5c": {
+    			_id: "e6154fe4-c6f8-45d0-a04d-df792b8c0d5c",
+    			_createdOn: 1701445333176,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81BORSK0fSL._SY466_.jpg",
+    			name: "Yona of the Dawn",
+    			volume: "2",
+    			price: 9.49,
+    			author: "Mizuho Kusanagi",
+    			genre: "romance",
+    			status: "ongoing",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Princess Yona lives an ideal life as the only princess of her kingdom. Doted on by her father, the king, and protected by her faithful guard Hak, she cherishes the time spent with the man she loves, Su-won. But everything changes on her 16th birthday when tragedy strikes her family! While on the run, Yona and Hak head to Hak's hometown, where she attempts to heal her broken heart. However, she can't rest there for long once she discovers that Su-won may soon become king! What will Yona choose to do in the wake of this news?"
+    		},
+    		"25db9603-253e-4eec-8962-24c62654d744": {
+    			_id: "25db9603-253e-4eec-8962-24c62654d744",
+    			_createdOn: 1701445333176,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81GIb6GMhRL._SY466_.jpg",
+    			name: "The Promised Neverland",
+    			volume: "1",
+    			price: 6.1,
+    			author: "Kaiu Shirai",
+    			genre: "mystery",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Life at Grace Field House is good for Emma and her fellow orphans. While the daily studying and exams they have to take are tough, their loving caretaker provides them with delicious food and plenty of playtime. But perhaps not everything is as it seems… Emma, Norman and Ray are the brightest kids at the Grace Field House orphanage. And under the care of the woman they refer to as “Mom,” all the kids have enjoyed a comfortable life. Good food, clean clothes and the perfect environment to learn—what more could an orphan ask for? One day, though, Emma and Norman uncover the dark truth of the outside world they are forbidden from seeing."
+    		},
+    		"8e95357b-9ee8-46be-8ef3-deed1ddc862c": {
+    			_id: "8e95357b-9ee8-46be-8ef3-deed1ddc862c",
+    			_createdOn: 1701445333176,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81atHQymv+L._SY466_.jpg",
+    			name: "The Promised Neverland",
+    			volume: "3",
+    			price: 6.1,
+    			author: "Kaiu Shirai",
+    			genre: "mystery",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Life at Grace Field House is good for Emma and her fellow orphans. While the daily studying and exams they have to take are tough, their loving caretaker provides them with delicious food and plenty of playtime. But perhaps not everything is as it seems… In order to escape the orphanage where they are being raised as food for demons, Emma, Norman and Ray begin recruiting allies. But convincing the other children to believe them may not be an easy task."
+    		},
+    		"09ba98bc-022b-4a9d-8963-fca6cf6a733f": {
+    			_id: "09ba98bc-022b-4a9d-8963-fca6cf6a733f",
+    			_createdOn: 1701445508624,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/912y5oJyJLL._SY466_.jpg",
+    			name: "Black Butler",
+    			volume: "14",
+    			price: 13,
+    			author: "Yana Toboso",
+    			genre: "mystery",
+    			status: "ongoing",
+    			pages: 178,
+    			language: "English",
+    			synopsis: "The veil of mystery cast over the Aurora Society's 'absolute salvation' is torn away, and the true mastermind behind the scheme steps forward at long last. In the ensuing battle, Earl Ciel Phantomhive looks on in horror as Sebastian, his infallible manservant, is struck down by the death scythe of an unforeseen combatant. Devil though he may be, even Sebastian is not immune to the blade of a reaper's scythe. As Sebastian's cinematic record spills forth, the tale of how a devil became a butler to a little lost lord flickers to life in shades of sepia, blood, and ash..."
+    		},
+    		"401e86ef-6385-4bab-8221-5702676d9b01": {
+    			_id: "401e86ef-6385-4bab-8221-5702676d9b01",
+    			_createdOn: 1701445566130,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/517mzKOIdXL._SY445_SX342_.jpg",
+    			name: "Black Butler",
+    			volume: "31",
+    			price: 13,
+    			author: "Yana Toboso",
+    			genre: "mystery",
+    			status: "ongoing",
+    			pages: 178,
+    			language: "English",
+    			synopsis: "Mey-Rin and Ran-Mao's victory is secured as they thoroughly dismantle the operation in North Yorkshire. Meanwhile, Baldo and Lau are headed to Wiltshire to investigate a sanatorium for war veterans that is rumored to be headed by a “miracle healer.” The skeptical cook is disinclined to believe in the existence of angels―but the incredulous sight that unfolds before his eyes might change his mind…"
+    		},
+    		"dc7e6b97-de37-4324-be4b-79ee3253bdbd": {
+    			_id: "dc7e6b97-de37-4324-be4b-79ee3253bdbd",
+    			_createdOn: 1701445696184,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/51IrW578SQL._SY445_SX342_.jpg",
+    			name: "Berserk Deluxe",
+    			volume: "1",
+    			price: 50,
+    			author: "Kentaro Miura",
+    			genre: "horror",
+    			status: "ongoing",
+    			pages: 696,
+    			language: "English",
+    			synopsis: "Guts, a former mercenary now known as the 'Black Swordsman', is out for revenge. After a tumultuous childhood, he finally finds someone he respects and believes he can trust, only to have everything fall apart when this person takes away everything important to Guts for the purpose of fulfilling his own desires. Now marked for death, Guts becomes condemned to a fate in which he is relentlessly pursued by demonic beings. Setting out on a dreadful quest riddled with misfortune, Guts, armed with a massive sword and monstrous strength, will let nothing stop him, not even death itself, until he is finally able to take the head of the one who stripped him—and his loved one—of their humanity."
+    		},
+    		"2a90d959-350d-4a78-bd82-42ef54a36f65": {
+    			_id: "2a90d959-350d-4a78-bd82-42ef54a36f65",
+    			_createdOn: 1701445750889,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81gv-D-LqhL._SY466_.jpg",
+    			name: "Tokyo Ghoul",
+    			volume: "1",
+    			price: 9.99,
+    			author: "Sui Ishida",
+    			genre: "horror",
+    			status: "completed",
+    			pages: 224,
+    			language: "English",
+    			synopsis: "Ghouls live among us, the same as normal people in every way—except their craving for human flesh. Ken Kaneki is an ordinary college student until a violent encounter turns him into the first half-human half-ghoul hybrid. Trapped between two worlds, he must survive Ghoul turf wars, learn more about Ghoul society and master his new powers. Shy Ken Kaneki is thrilled to go on a date with the beautiful Rize. But it turns out that she's only interested in his body—eating it, that is. When a morally questionable rescue transforms him into the first half-human half-Ghoul hybrid, Ken is drawn into the dark and violent world of Ghouls, which exists alongside our own."
+    		},
+    		"d922bc54-7c1b-4726-a498-6ef1f180dd0c": {
+    			_id: "d922bc54-7c1b-4726-a498-6ef1f180dd0c",
+    			_createdOn: 1701445808185,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/61dmrRwKh1L._SY466_.jpg",
+    			name: "Tokyo Ghoul: re",
+    			volume: "1",
+    			price: 9.99,
+    			author: "Sui Ishida",
+    			genre: "horror",
+    			status: "completed",
+    			pages: 216,
+    			language: "English",
+    			synopsis: "The Commission of Counter Ghoul is the only organization fighting the Ghoul menace, and they will use every tool at their disposal to protect humanity from its ultimate predator. Their newest weapon in this hidden war is an experimental procedure that implants human investigators with a Ghoul's Kagune, giving them Ghoul powers and abilities. But both the procedure and the newly formed Qs Squad are untested. Will they become heroes…or monsters?! Haise Sasaki has been tasked with teaching Qs Squad how to be outstanding investigators, but his assignment is complicated by the troublesome personalities of his students and his own uncertain grasp of his Ghoul powers. Can he pull them together as a team, or will Qs Squad first assignment be their last?"
+    		},
+    		"5706a74f-c5d8-4be5-b443-9e46ec7883cc": {
+    			_id: "5706a74f-c5d8-4be5-b443-9e46ec7883cc",
+    			_createdOn: 1701445901538,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81qip4V12SL._SY466_.jpg",
+    			name: "Horimiya",
+    			volume: "1",
+    			price: 9.11,
+    			author: "HERO",
+    			genre: "romance",
+    			status: "completed",
+    			pages: 176,
+    			language: "English",
+    			synopsis: "At school, Kyouko Hori is known for being smart, attractive, and popular. On the other hand, her classmate, the boring, gloomy Izumi Miyamura tends to get painted as a 'loser fanboy'. But when a liberally pierced and tattooed (not to mention downright gorgeous) Miyamura appears unexpectedly on the doorstep of secretly plain-Jane homebody Hori, these two similarly dissimilar teenagers discover that there are multiple sides to every story...and person!"
+    		},
+    		"daac9329-c7d5-4545-a886-e6094f2c576c": {
+    			_id: "daac9329-c7d5-4545-a886-e6094f2c576c",
+    			_createdOn: 1701445990353,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/51pyc5sYK7L._SY445_SX342_.jpg",
+    			name: "Horimiya",
+    			volume: "2",
+    			price: 9.11,
+    			author: "HERO",
+    			genre: "romance",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "By all appearances, Kyouko Hori and Izumi Miyamura are worlds apart. Bright and capable, Hori is always surrounded by classmates, the center of attention. For Miyamura, a quirky loner, getting through class unnoticed counts as a good day. But ever since these two started sharing secrets, they've found themselves drawn into each other's orbit little by little and the distance between them shrinking bit by bit..."
+    		},
+    		"d3e58f90-12fc-470d-a9de-d719fa7b7715": {
+    			_id: "d3e58f90-12fc-470d-a9de-d719fa7b7715",
+    			_createdOn: 1701446089892,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81k6fYmHN6L._SY466_.jpg",
+    			name: "The Quintessential Quintuplets",
+    			volume: "1",
+    			price: 10.99,
+    			author: "Negi Haruba",
+    			genre: "romance",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Five girls who want to do anything but study, and their tutor: A high school boy who's got book smarts and not much else. Futaro Uesugi took the tutoring gig because he was desperate for cash, but when his students--the five beautiful daughters of a wealthy businessman--find five times the excuses to slack off, what can he do?! At this rate, the sisters won't graduate, so if he wants to get paid, Futaro must think of a plan to suit each of them... Which feels hopeless when five out of five of them think he's a loser!"
+    		},
+    		"9c830ba8-f007-4618-8d58-681d1a8f0c04": {
+    			_id: "9c830ba8-f007-4618-8d58-681d1a8f0c04",
+    			_createdOn: 1701446158947,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81JCbXEyYKL._SY466_.jpg",
+    			name: "The Quintessential Quintuplets",
+    			volume: "4",
+    			price: 10.99,
+    			author: "Negi Haruba",
+    			genre: "romance",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Futaro continues to lead the Quints to academic aptitude, but there are some treats in store for him as well! Having nearly missed his long-awaited school trip, Futaro tries to make the best of the situation and works on getting closer to all five girls. After getting a tip from one of the sisters, Futaro takes a different approach to getting the girls interested in their studies. Will they accept him into their lives...? Or will this really be the end of his short tutoring career?"
+    		},
+    		"037d18a7-e35a-4fef-91f2-49ed1f261091": {
+    			_id: "037d18a7-e35a-4fef-91f2-49ed1f261091",
+    			_createdOn: 1701446216446,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/8125DI58M+L._SY466_.jpg",
+    			name: "Haikyu!!",
+    			volume: "1",
+    			price: 5.99,
+    			author: "Haruichi Furudate",
+    			genre: "sports",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? After losing his first and last volleyball match against Tobio Kageyama, “the King of the Court,” Shoyo Hinata swears to become his rival after graduating middle school. But what happens when the guy he wants to defeat ends up being his teammate?!"
+    		},
+    		"38e6fcea-a1bf-4d42-b1c0-c1fb76709d75": {
+    			_id: "38e6fcea-a1bf-4d42-b1c0-c1fb76709d75",
+    			_createdOn: 1701446271272,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/51lDTDxNgiL._SY445_SX342_.jpg",
+    			name: "Haikyu!!",
+    			volume: "4",
+    			price: 5.99,
+    			author: "Haruichi Furudate",
+    			genre: "sports",
+    			status: "completed",
+    			pages: 216,
+    			language: "English",
+    			synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? The training camp kicks off with a bang! Hinata and his teammates train their hearts out in preparation for the practice game against Nekoma, but they'll need to polish their receiving skills if they want to win. After all their hard work, the moment they've all been waiting for finally arrives—the revival of the long-standing rivalry between the Cats and the Crows! And Nekoma's starting setter looks vaguely familiar…"
+    		},
+    		"ee08a6f2-4e09-4fdc-bb58-33f2efa5b6a2": {
+    			_id: "ee08a6f2-4e09-4fdc-bb58-33f2efa5b6a2",
+    			_createdOn: 1701446336146,
+    			_ownerId: "35c62d76-8152-4626-8712-eeb96381bea8",
+    			imageUrl: "https://m.media-amazon.com/images/I/81uROkePvYL._SY466_.jpg",
+    			name: "Haikyu!!",
+    			volume: "44",
+    			price: 5.99,
+    			author: "Haruichi Furudate",
+    			genre: "sports",
+    			status: "completed",
+    			pages: 192,
+    			language: "English",
+    			synopsis: "Ever since he saw the legendary player known as “the Little Giant” compete at the national volleyball finals, Shoyo Hinata has been aiming to be the best volleyball player ever! Who says you need to be tall to play volleyball when you can jump higher than anyone else? Hinata and Kageyama finally meet again, this time in the V.League. Even amid the high-level plays between the top-tier Adlers and Black Jackals, Hinata shows off all that he can do and makes big waves on the court! Once again facing Hinata as an opponent, Kageyama watches him with growing excitement as he navigates the court."
+    		},
+    		"59009b3d-2ff5-4d18-9474-c235082423c4": {
+    			_id: "59009b3d-2ff5-4d18-9474-c235082423c4",
+    			_createdOn: 1701446484133,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/71Ov8pDg16L._SY466_.jpg",
+    			name: "Blue Lock",
+    			volume: "9",
+    			price: 10.99,
+    			author: "Muneyuki Kaneshiro",
+    			genre: "sports",
+    			status: "ongoing",
+    			pages: 208,
+    			language: "English",
+    			synopsis: "Thanks to Barou's awakening, Isagi's team manages to defeat the trio of Kunigami, Chigiri, and Reo. And the one that Isagi chooses to steal is... The new four-man team sets out for a rematch against the Top Three and Bachira. Will the 'monster' that fuels Isagi's ego be enough to take down the prodigy striker Rin Itoshi?!"
+    		},
+    		"3d2f63ae-d9de-4f82-ba6f-aee5c0b680cb": {
+    			_id: "3d2f63ae-d9de-4f82-ba6f-aee5c0b680cb",
+    			_createdOn: 1701446598598,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/81W9TXFd6xL._SY466_.jpg",
+    			name: "Blue Lock",
+    			volume: "5",
+    			price: 10.99,
+    			author: "Muneyuki Kaneshiro",
+    			genre: "sports",
+    			status: "ongoing",
+    			pages: 208,
+    			language: "English",
+    			synopsis: "In the face of Team V, Team Z has managed to catch up 3-3 with fifteen minutes remaining. Amid this tense environment, all the players seek their 'awakening' that will take their skills to the next level... Will they manage to beat Team V and qualify for the next selection--or will they be stuck on the playing field with nowhere to go?"
+    		},
+    		"a6b66221-b57d-4595-ada7-7dbf0d6d48b6": {
+    			_id: "a6b66221-b57d-4595-ada7-7dbf0d6d48b6",
+    			_createdOn: 1701446678899,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/514l+Y9eApL._SY445_SX342_.jpg",
+    			name: "Blue Lock",
+    			volume: "2",
+    			price: 10.99,
+    			author: "Muneyuki Kaneshiro",
+    			genre: "sports",
+    			status: "ongoing",
+    			pages: 208,
+    			language: "English",
+    			synopsis: "Yoichi Isagi, one of three hundred high school soccer players is in Team Z--the lowest ranked group in the controversial training facility, Blue Lock, where the aim is to create Japan's best striker. To survive their first round-robin tournament, Isagi's Team Z will need to find a way to use their unique 'weapons', while struggling through a clash of egos. But Isagi grapples to understand what his strength is as a striker..."
+    		},
+    		"c6a10d0d-4ac0-40e8-80a9-46d5235777d5": {
+    			_id: "c6a10d0d-4ac0-40e8-80a9-46d5235777d5",
+    			_createdOn: 1701446745566,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/81CeGGwz+BL._SY466_.jpg",
+    			name: "Uzumaki",
+    			volume: "1, 2, 3",
+    			price: 33.99,
+    			author: "Junji Ito",
+    			genre: "horror",
+    			status: "completed",
+    			pages: 648,
+    			language: "English",
+    			synopsis: "Kurouzu-cho, a small fogbound town on the coast of Japan, is cursed. According to Shuichi Saito, the withdrawn boyfriend of teenager Kirie Goshima, their town is haunted not by a person or being but a pattern: UZUMAKI, the spiral—the hypnotic secret shape of the world. The bizarre masterpiece horror manga is now available all in a single volume. Fall into a whirlpool of terror!"
+    		},
+    		"ddb1c067-5314-4ffb-91d0-54572967f45e": {
+    			_id: "ddb1c067-5314-4ffb-91d0-54572967f45e",
+    			_createdOn: 1701446935390,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/91-um1ueRqL._SY466_.jpg",
+    			name: "Dorohedoro",
+    			volume: "1",
+    			price: 12.59,
+    			author: "Q Hayashida",
+    			genre: "comedy",
+    			status: "completed",
+    			pages: 176,
+    			language: "English",
+    			synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers have been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds."
+    		},
+    		"39f33d15-281d-40d6-9997-353dea766c4e": {
+    			_id: "39f33d15-281d-40d6-9997-353dea766c4e",
+    			_createdOn: 1701447002398,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/81RUuav+oxL._SY466_.jpg",
+    			name: "Dorohedoro",
+    			volume: "2",
+    			price: 12.59,
+    			author: "Q Hayashida",
+    			genre: "comedy",
+    			status: "completed",
+    			pages: 160,
+    			language: "English",
+    			synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers has been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds. Once a year, hordes of the dead rise and roam the streets of the Hole, hungry for live flesh. And every year, Caiman and Nikaido sign up for the local zombie-killing contest! Whoever sends the most zombies back into the ground will win some fantastic prizes. But the fun ends quickly when En's cleaners finally track down Caiman and Nikaido. Somebody's going to lose their head. Literally."
+    		},
+    		"442c0bef-d7fa-4293-991d-694f11ed7168": {
+    			_id: "442c0bef-d7fa-4293-991d-694f11ed7168",
+    			_createdOn: 1701447078137,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/616nT3lazIL._SY466_.jpg",
+    			name: "Dorohedoro",
+    			volume: "3",
+    			price: 12.59,
+    			author: "Q Hayashida",
+    			genre: "comedy",
+    			status: "completed",
+    			pages: 176,
+    			language: "English",
+    			synopsis: "In a city so dismal it's known only as 'the Hole', a clan of Sorcerers has been plucking people off the streets to use as guinea pigs for atrocious 'experiments' in the black arts. In a dark alley, Nikaido found Caiman, a man with a reptile head and a bad case of amnesia. To undo the spell, they're hunting and killing the Sorcerers in the Hole, hoping that eventually they'll kill the right one. But when En, the head Sorcerer, gets word of a lizard-man slaughtering his people, he sends a crew of 'cleaners' into the Hole, igniting a war between two worlds. While En seeks out a new partner with unique magic powers, his crew has a run-in with an underground organization that controls the distribution of 'black powder', a magic-enhancing drug used by weaker Sorcerers. Meanwhile, Caiman and Nikaido spend New Year's in the haunted mansion of a mysterious doctor who specializes in the anatomy of Sorcerers. The doctor reveals to them the only known portal to the Sorcerers' dimension..."
+    		},
+    		"a06de3f4-5618-4e96-a56c-3f9b6bc495db": {
+    			_id: "a06de3f4-5618-4e96-a56c-3f9b6bc495db",
+    			_createdOn: 1701447143078,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/91toFx95GzL._SY466_.jpg",
+    			name: "Ajin",
+    			volume: "2",
+    			price: 11.99,
+    			author: "Gamon Sakurai",
+    			genre: "horror",
+    			status: "completed",
+    			pages: 200,
+    			language: "English",
+    			synopsis: "A bright high schooler has discovered to his horror that death is just a repeatable event for him - and that humanity has no mercy for a demi-human. To avoid becoming a science experiment for the rest of his interminable life, Kei Nagai must seek out others of his kind. But what would a community of them stand for?"
+    		},
+    		"12046ffb-2d92-488c-bea7-de305d34605b": {
+    			_id: "12046ffb-2d92-488c-bea7-de305d34605b",
+    			_createdOn: 1701447193013,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/719AXHRvCiL._SY466_.jpg",
+    			name: "Ajin",
+    			volume: "3",
+    			price: 11.99,
+    			author: "Gamon Sakurai",
+    			genre: "horror",
+    			status: "completed",
+    			pages: 194,
+    			language: "English",
+    			synopsis: "The true aim of the raid on the research center is revealed by demi-human mastermind Sato, whose Bolshevik ruthlessness and cunning prove worthy of his choice of headgear."
+    		},
+    		"10a339cf-fcea-4d3e-893f-6a5fb19420d0": {
+    			_id: "10a339cf-fcea-4d3e-893f-6a5fb19420d0",
+    			_createdOn: 1701447243121,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/81VAgJoB3BL._SY466_.jpg",
+    			name: "One Punch Man",
+    			volume: "1",
+    			price: 9.99,
+    			author: "ONE",
+    			genre: "comedy",
+    			status: "ongoing",
+    			pages: 200,
+    			language: "English",
+    			synopsis: "Nothing about Saitama passes the eyeball test when it comes to superheroes, from his lifeless expression to his bald head to his unimpressive physique. However, this average-looking guy has a not-so-average problem—he just can't seem to find an opponent strong enough to take on! Every time a promising villain appears, Saitama beats the snot out of 'em with one punch! Can he finally find an opponent who can go toe-to-toe with him and give his life some meaning? Or is he doomed to a life of superpowered boredom?"
+    		},
+    		"a7147d5b-3046-45a0-ad4e-6c69a7a66c3d": {
+    			_id: "a7147d5b-3046-45a0-ad4e-6c69a7a66c3d",
+    			_createdOn: 1701447298854,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/810RdR69pBL._SY466_.jpg",
+    			name: "One Punch Man",
+    			volume: "2",
+    			price: 9.99,
+    			author: "ONE",
+    			genre: "comedy",
+    			status: "ongoing",
+    			pages: 200,
+    			language: "English",
+    			synopsis: "Nothing about Saitama passes the eyeball test when it comes to superheroes, from his lifeless expression to his bald head to his unimpressive physique. However, this average-looking guy has a not-so-average problem—he just can't seem to find an opponent strong enough to take on! Saitama's easily taken out a number of monsters, including a crabby creature, a malicious mosquito girl and a muscly meathead. But his humdrum life takes a drastic turn when he meets Genos—a cyborg who wants to uncover the secret behind his strength!"
+    		},
+    		"6cc6b6e3-031a-486f-8850-d2e81ee31901": {
+    			_id: "6cc6b6e3-031a-486f-8850-d2e81ee31901",
+    			_createdOn: 1701447360221,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/71vMGRog+iL._SY466_.jpg",
+    			name: "Spy x Family",
+    			volume: "1",
+    			price: 6.99,
+    			author: "Tatsuya Endo",
+    			genre: "comedy",
+    			status: "ongoing",
+    			pages: 220,
+    			language: "English",
+    			synopsis: "Master spy Twilight is unparalleled when it comes to going undercover on dangerous missions for the betterment of the world. But when he receives the ultimate assignment—to get married and have a kid—he may finally be in over his head! Not one to depend on others, Twilight has his work cut out for him procuring both a wife and a child for his mission to infiltrate an elite private school. What he doesn't know is that the wife he's chosen is an assassin and the child he's adopted is a telepath!"
+    		},
+    		"f3a6b495-8bfd-49c3-af3b-9b705994ec68": {
+    			_id: "f3a6b495-8bfd-49c3-af3b-9b705994ec68",
+    			_createdOn: 1701447509714,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/61iyxqz5ZhL._SY466_.jpg",
+    			name: "Vagabond",
+    			volume: "1",
+    			price: 24.99,
+    			author: "Takehiko Inoue",
+    			genre: "action",
+    			status: "hiatus",
+    			pages: 600,
+    			language: "English",
+    			synopsis: "At seventeen years of age, Miyamoto Musashi--still known by his childhood name, Shinmen Takezō--was a wild young brute just setting out along the way of the sword. In the aftermath of the epic Battle of Sekigahara, Takezō finds himself a fugitive survivor on the losing side of the war. Takezō's vicious nature has made him an outcast even in his own village, and he is hunted down like an animal. At this crucial crossroads in Takezō's life, an eccentric monk and a childhood friend are the only ones who can help him find his way."
+    		},
+    		"7c742f49-61fd-466c-8185-db8a918e3a3a": {
+    			_id: "7c742f49-61fd-466c-8185-db8a918e3a3a",
+    			_createdOn: 1701447562494,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/71y+XnBXm4L._SY466_.jpg",
+    			name: "One Piece",
+    			volume: "1",
+    			price: 9.99,
+    			author: "Eiichiro Oda",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 216,
+    			language: "English",
+    			synopsis: "As a child, Monkey D. Luffy dreamed of becoming King of the Pirates. But his life changed when he accidentally gained the power to stretch like rubber…at the cost of never being able to swim again! Years, later, Luffy sets off in search of the “One Piece,” said to be the greatest treasure in the world... As a child, Monkey D. Luffy was inspired to become a pirate by listening to the tales of the buccaneer 'Red-Haired' Shanks. But his life changed when Luffy accidentally ate the Gum-Gum Devil Fruit and gained the power to stretch like rubber...at the cost of never being able to swim again! Years later, still vowing to become the king of the pirates, Luffy sets out on his adventure...one guy alone in a rowboat, in search of the legendary 'One Piece', said to be the greatest treasure in the world..."
+    		},
+    		"d184c493-48a4-4006-9dab-fba1341e7e64": {
+    			_id: "d184c493-48a4-4006-9dab-fba1341e7e64",
+    			_createdOn: 1701447617883,
+    			_ownerId: "847ec027-f659-4086-8032-5173e2f9c93a",
+    			imageUrl: "https://m.media-amazon.com/images/I/A1F6J2dBalL._SY466_.jpg",
+    			name: "One Piece",
+    			volume: "52",
+    			price: 9.99,
+    			author: "Eiichiro Oda",
+    			genre: "action",
+    			status: "ongoing",
+    			pages: 216,
+    			language: "English",
+    			synopsis: "In his effort to save Camie the mermaid from being sold to the highest bidder, Luffy's attack on an exalted Celestial Dragon has given the Navy the green light to send the Admirals in after him. But the Straw Hats get help from an unexpected source--a mysterious outlaw who knows all about Gold Roger, the original King of the Pirates!"
+    		}
+    	}
+    };
+    var rules$1 = {
+    	users: {
+    		".create": false,
+    		".read": [
+    			"Owner"
+    		],
+    		".update": false,
+    		".delete": false
+    	},
+    	members: {
+    		".update": "isOwner(user, get('teams', data.teamId))",
+    		".delete": "isOwner(user, get('teams', data.teamId)) || isOwner(user, data)",
+    		"*": {
+    			teamId: {
+    				".update": "newData.teamId = data.teamId"
+    			},
+    			status: {
+    				".create": "newData.status = 'pending'"
+    			}
+    		}
+    	}
     };
     var settings = {
-        identity: identity,
-        protectedData: protectedData,
-        seedData: seedData
+    	identity: identity,
+    	protectedData: protectedData,
+    	seedData: seedData,
+    	rules: rules$1
     };
 
     const plugins = [
         storage(settings),
         auth(settings),
-        util$2()
+        util$2(),
+        rules(settings)
     ];
 
     const server = http__default['default'].createServer(requestHandler(plugins, services));
@@ -1682,10 +1936,10 @@
     console.log(`Server started on port ${port}. You can make requests to http://localhost:${port}/`);
     console.log(`Admin panel located at http://localhost:${port}/admin`);
 
-    var softuniPracticeServer = {
+    var softuniPracticeServerMaster = {
 
     };
 
-    return softuniPracticeServer;
+    return softuniPracticeServerMaster;
 
 })));
