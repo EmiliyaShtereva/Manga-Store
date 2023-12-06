@@ -80,15 +80,11 @@
 .acount-text {
   color: #4e4d4d;
   font-size: 1.7vh;
-  /* margin-top: 20px;
-  margin-bottom: 0; */
 }
 
 .forms-btn {
   background-color: transparent;
   color: #b369fe;
-  /* border: none; */
-  /* padding: 0; */
   font-size: 1.7vh;
   text-decoration: none;
 }

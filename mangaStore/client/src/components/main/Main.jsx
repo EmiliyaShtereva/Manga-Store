@@ -1,13 +1,6 @@
-import { useNavigate } from 'react-router-dom';
 import styles from './Main.module.css';
 
 export default function Main() {
-    const navigate = useNavigate();
-
-    const onFullSiteClick = () => {
-        navigate('/');
-    }
-
     return (
         <div className={styles['hero-conteiner']}>
             <div className={styles['image-conteiner']}>
