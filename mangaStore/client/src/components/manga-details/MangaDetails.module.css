@@ -101,3 +101,7 @@
     line-height: 4.5vh;
     padding-top: 2vh;
 }
+
+.manga-details .comments {
+    padding: 0 20vh 10vh 20vh;
+}

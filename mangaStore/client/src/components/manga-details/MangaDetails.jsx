@@ -6,6 +6,7 @@ import Footer from '../footer/Footer';
 import NavBar from '../navbar/NavBar';
 import Spinner from '../spinner/Spinner';
 import AuthContext from '../../context/authContext';
+import Comments from './comments/Comments';
 
 export default function MangaDetails() {
     const navigate = useNavigate();
@@ -68,10 +69,10 @@ export default function MangaDetails() {
                         <div className={styles['buttons']}>
                             {manga._ownerId == userId
                                 ? (
-                                <>
-                                    <button className={styles['edit']} onClick={() => navigate(`/edit/${mangaId}`)}>Edit</button>
-                                    <button className={styles['delete']} onClick={deleteButtonClickHandler}>Delete</button>
-                                </>
+                                    <>
+                                        <button className={styles['edit']} onClick={() => navigate(`/edit/${mangaId}`)}>Edit</button>
+                                        <button className={styles['delete']} onClick={deleteButtonClickHandler}>Delete</button>
+                                    </>
                                 )
                                 : (<button className={styles['purchase']} onClick={purchaseClickHandler}>Purchase</button>)
                             }
@@ -81,6 +82,9 @@ export default function MangaDetails() {
                         <h1>Synopsis</h1>
                         <p>{manga.synopsis}</p>
                     </div>
+                </div>
+                <div className={styles['comments']}>
+                    <Comments />
                 </div>
             </div>
             <Footer />
