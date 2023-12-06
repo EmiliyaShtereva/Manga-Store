@@ -16,7 +16,7 @@ export const getLatest = async () => {
         offset: 0,
         pageSize: 15
     })
-    const response = await fetch(`${baseUrl}?${query}`, {
+    const response = await fetch(`${baseUrl}?sortBy=_createdOn%20desc${query}`, {
         method: 'GET',
     });
     const result = await response.json();
