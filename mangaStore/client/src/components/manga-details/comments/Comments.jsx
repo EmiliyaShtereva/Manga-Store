@@ -7,7 +7,7 @@ import AuthContext from '../../../context/authContext';
 
 export default function Comments() {
     const [comment, setComment] = useState([]);
-    const { username } = useContext(AuthContext);
+    const { isAuthenticated, username } = useContext(AuthContext);
     const { mangaId } = useParams();
 
     useEffect(() => {
@@ -22,7 +22,7 @@ export default function Comments() {
     const addCommentHandler = async () => {
         const newComment = await commentService.create({ mangaId, text: values.comment });
         newComment.owner = { username: username }
-        setComment(state => [...state, { ...newComment}]);
+        setComment(state => [...state, { ...newComment }]);
         values.comment = '';
     }
 
@@ -34,10 +34,12 @@ export default function Comments() {
         <>
             <div className={styles['create-comment']}>
                 <label>Add new comment:</label>
-                <form className={styles['form']} onSubmit={onSubmit}>
-                    <textarea name="comment" value={values.comment} onChange={onChange} placeholder="Comment......"></textarea>
-                    <button className={styles['btn-submit']} type="submit">Add Comment</button>
-                </form>
+                {isAuthenticated
+                    ? (<form className={styles['form']} onSubmit={onSubmit}>
+                        <textarea name="comment" value={values.comment} onChange={onChange} placeholder="Comment......"></textarea>
+                        <button className={styles['btn-submit']} type="submit">Add Comment</button>
+                    </form>)
+                    : (<p className={styles['no-comment']}>You have to Sign in to comment.</p>)}
             </div>
             <div className={styles['details-comments']}>
                 <label>Comments:</label>

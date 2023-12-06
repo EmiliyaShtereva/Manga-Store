@@ -77,8 +77,9 @@
     color: #b369fe;
 }
 
-.details-comments .no-comment {
-    padding: 0 2vh 0 40%;
+.details-comments .no-comment,
+.create-comment .no-comment {
+    padding: 0 2vh 0 30%;
     font-size: 5vh;
     font-weight: 500;
     color: #4e3369;
