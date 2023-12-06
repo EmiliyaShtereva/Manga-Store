@@ -39,11 +39,8 @@ export default function Catalog() {
                     .catch(err => console.log(err))
                     .finally(() => setIsLoading(false))
             } else {
-                mangaService.getGenre(formValues.genre)
-                    .then(result => setManga(
-                        result
-                            .filter(m => m.status.includes(formValues.status))
-                    ))
+                mangaService.getGenreAndStatus(formValues.genre, formValues.status)
+                    .then(result => setManga(result))
                     .catch(err => console.log(err))
                     .finally(() => setIsLoading(false))
             }
