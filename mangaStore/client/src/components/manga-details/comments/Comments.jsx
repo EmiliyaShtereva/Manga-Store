@@ -11,12 +11,12 @@ export default function Comments() {
     const { mangaId } = useParams();
 
     useEffect(() => {
-        // setIsLoading(true);
-
         commentService.getAll(mangaId)
             .then(result => setComment(result))
-            .catch(err => console.log(err))
-        // .finally(() => setIsLoading(false));
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
     }, [mangaId]);
 
     const addCommentHandler = async () => {

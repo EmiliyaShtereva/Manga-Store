@@ -4,11 +4,13 @@ import Footer from '../../footer/Footer';
 import NavBar from '../../navbar/NavBar';
 import * as mangaService from '../../../services/mangaService'
 import { useNavigate, useParams } from 'react-router-dom';
+import Spinner from '../../spinner/Spinner';
 
 export default function Edit() {
     const navigate = useNavigate();
     const nameInputRef = useRef();
     const { mangaId } = useParams();
+    const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [values, setValues] = useState({
         name: '',
@@ -24,22 +26,31 @@ export default function Edit() {
     });
 
     useEffect(() => {
+        nameInputRef.current.focus();
+    }, []);
+
+    useEffect(() => {
+        setIsLoading(true);
+
         mangaService.getOne(mangaId)
             .then(result => {
                 setValues(result);
             })
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
+            .finally(() => setIsLoading(false))
     }, [mangaId]);
-
-    useEffect(() => {
-        nameInputRef.current.focus();
-    }, []);
 
     const onSubmit = (e) => {
         e.preventDefault();
         mangaService.edit(mangaId, values)
             .then(navigate(`/details/${mangaId}`))
-            .catch(err => console.log(err))
-            // .finally(() => {navigate('/catalog');});
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
     }
 
     const onChange = (e) => {
@@ -143,6 +154,7 @@ export default function Edit() {
     return (
         <>
             <NavBar />
+            {isLoading && <Spinner />}
             <div className={styles['modal']}>
                 <form className={styles['form']} onSubmit={onSubmit}>
                     <div className={styles['conteiner']}>

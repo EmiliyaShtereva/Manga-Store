@@ -29,13 +29,12 @@ export default function Create() {
     }, []);
 
     const createSubmitHandler = async (values) => {
-        try {
-            await mangaService.create(values);
-            navigate('/catalog');
-        } catch (err) {
-            //Error notification
-            console.log(err);
-        }
+        await mangaService.create(values)
+            .then(navigate(`/catalog`))
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
     }
 
     const { values, onChange, onSubmit } = useForm(createSubmitHandler, formInitialstate);

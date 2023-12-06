@@ -14,6 +14,8 @@ import AuthGuards from "./components/guards/AuthGuards.jsx";
 import Page404 from "./components/Page404/Page404.jsx";
 import Purchase from "./components/manga-details/purchase/Purchase.jsx";
 import Edit from "./components/manga-details/edit/Edit.jsx";
+import Search from "./components/navbar/search/Search.jsx";
+import SomethingWentWrong from "./components/something-went-wrong/SomethingWentWrong.jsx";
 
 function App() {
   return (
@@ -22,6 +24,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
@@ -35,6 +38,7 @@ function App() {
           <Route path="/edit/:mangaId" element={<Edit />} />
         </Route>
 
+        <Route path="/something-went-wrong" element={<SomethingWentWrong />} />
         <Route path="*" element={<Page404 />} />
       </Routes>
     </AuthProvider>

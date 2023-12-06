@@ -13,8 +13,7 @@ const formInitialstate = {
 
 export default function SignIn() {
     const emailInputRef = useRef();
-    const { signInSubmitHandler } = useContext(AuthContext);
-    const { errorMessage } = useContext(AuthContext);
+    const { signInSubmitHandler, errorMessage } = useContext(AuthContext);
     const { values, onChange, onSubmit } = useForm(signInSubmitHandler, formInitialstate);
     const [errors, setErrors] = useState({});
 

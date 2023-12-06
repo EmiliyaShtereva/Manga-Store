@@ -5,8 +5,10 @@ import MangaListItem from "../list-item/MangaListItem";
 import NavBar from "../navbar/NavBar";
 import Footer from "../footer/Footer";
 import Spinner from "../spinner/Spinner";
+import { useNavigate } from "react-router-dom";
 
 export default function Catalog() {
+    const navigate = useNavigate()
     const [manga, setManga] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -24,24 +26,36 @@ export default function Catalog() {
             if (formValues.status == 'all') {
                 mangaService.getAll()
                     .then(result => setManga(result))
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err);
+                        navigate('/something-went-wrong');
+                    })
                     .finally(() => setIsLoading(false))
             } else {
                 mangaService.getStatus(formValues.status)
                     .then(result => setManga(result))
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err);
+                        navigate('/something-went-wrong');
+                    })
                     .finally(() => setIsLoading(false))
             }
         } else {
             if (formValues.status == 'all') {
                 mangaService.getGenre(formValues.genre)
                     .then(result => setManga(result))
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err);
+                        navigate('/something-went-wrong');
+                    })
                     .finally(() => setIsLoading(false))
             } else {
                 mangaService.getGenreAndStatus(formValues.genre, formValues.status)
                     .then(result => setManga(result))
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err);
+                        navigate('/something-went-wrong');
+                    })
                     .finally(() => setIsLoading(false))
             }
         }

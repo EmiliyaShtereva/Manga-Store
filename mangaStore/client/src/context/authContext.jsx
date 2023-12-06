@@ -2,6 +2,7 @@ import { createContext, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import * as authService from '../services/authService.js';
+import * as mangaService from '../services/mangaService.js';
 import usePersistedState from "../hooks/usePersistedState.js";
 
 const AuthContext = createContext();
@@ -10,6 +11,8 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [auth, setAuth] = usePersistedState('accessToken', {});
     const [errorMessage, setErrorMessage] = useState('');
+    const [searchInfo, setSearchInfo] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const signInSubmitHandler = async (values) => {
         const result = await authService.login({ email: values.email, password: values.password });
@@ -47,10 +50,24 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('accessToken');
     }
 
+    const searchHandler = async (values) => {
+        setIsLoading(true);
+        await mangaService.getSearch(values.search)
+            .then(result => {
+                setSearchInfo(result);
+                navigate('/search');
+            })
+            .catch(err => console.log(err))
+            .finally(() => setIsLoading(false))
+    }
+
     const values = {
         signInSubmitHandler,
         signUpSubmitHandler,
         logoutHandler,
+        searchHandler,
+        searchInfo,
+        isLoading,
         isAuthenticated: !!auth.accessToken,
         username: auth.username,
         userId: auth._id,

@@ -61,6 +61,14 @@ export const getGenreAndStatus = async (genre, status) => {
     return result;
 }
 
+export const getSearch = async (search) => {
+    const response = await fetch(`${baseUrl}?where=name LIKE %22${search}%22`, {
+        method: 'GET',
+    });
+    const result = await response.json();
+    return result;
+}
+
 export const create = async (mangaData) => {
     const token = JSON.parse(localStorage.getItem('accessToken'));
     const response = await fetch(`${baseUrl}`, {

@@ -16,7 +16,10 @@ export default function HomePage() {
 
         mangaService.getLatest()
             .then(result => setManga(result))
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
             .finally(() => setIsLoading(false))
     }, []);
 

@@ -1,0 +1,12 @@
+.page-not-found {
+    margin-top: 10vh;
+    padding: 25vh;
+    text-align: center;
+    background-image: linear-gradient(rgba(0, 0, 0, 1), rgba(25, 5, 41, 0.8));
+}
+
+.page-not-found p {
+    font-size: 8vh;
+    font-weight: bold;
+    color: #4e3369;
+}

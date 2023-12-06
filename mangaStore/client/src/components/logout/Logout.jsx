@@ -13,9 +13,9 @@ export default function Logout() {
                 logoutHandler();
                 navigate('/');
             })
-            .catch(() => {
-                logoutHandler();
-                navigate('/');
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
             });
     }, []);
 

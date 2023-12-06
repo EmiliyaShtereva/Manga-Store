@@ -20,7 +20,10 @@ export default function MangaDetails() {
 
         mangaService.getOne(mangaId)
             .then(setManga)
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.log(err);
+                navigate('/something-went-wrong');
+            })
             .finally(() => setIsLoading(false));
     }, []);
 
