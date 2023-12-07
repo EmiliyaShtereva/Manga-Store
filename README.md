@@ -6,10 +6,10 @@ This is a React project for an online manga shop which is for manga lovers to be
 
 ## Summary
 
-- [Technologies Used](##-technologies-used)
-- [Backend](##-backend)
-- [Architecture and Directories](##-architecture-and-directories)
-- [License](##-license)
+- [Technologies Used](#technologies-used)
+- [Backend](#backend)
+- [Architecture and Directories](#architecture-and-directories)
+- [License](#license)
 
 ## Technologies Used
 
