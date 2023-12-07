@@ -13,7 +13,6 @@ export default function Search() {
         <>
             <NavBar />
             <div className={styles['search-list']}>
-                <h1 className={styles['heading-text']}>Search</h1>
                 {isLoading && <Spinner />}
                 <div className={styles['manga-container']}>
                     {searchInfo.map(s => (

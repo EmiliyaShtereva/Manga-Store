@@ -4,7 +4,7 @@ import Footer from '../footer/Footer';
 import MangaListItem from '../list-item/MangaListItem';
 import NavBar from '../navbar/NavBar';
 import styles from './HomePage.module.css';
-import Main from '../main/Main';
+import Main from './main/Main';
 import Spinner from '../spinner/Spinner';
 
 export default function HomePage() {

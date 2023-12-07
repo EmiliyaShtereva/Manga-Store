@@ -72,7 +72,6 @@ export default function Catalog() {
         <>
             <NavBar />
             <div className={styles['manga-list']}>
-                <h1 className={styles['heading-text']}>{formValues.genre.toUpperCase()}</h1>
                 <div className={styles['selector']}>
                     <label htmlFor="genre">Genre:</label>
                     <select name="genre" id="genre" onChange={changeHandler} value={formValues.genre}>
