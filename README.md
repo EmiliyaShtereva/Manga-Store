@@ -1,6 +1,6 @@
 # Manga-Store
 
-This is a React project for an online manga shop which is for manga lovers to be able to buy and sell their favorite titles.
+This is a React project for an online manga shop, where manga lovers are able to buy and sell their favorite titles.
 
 ![image](https://github.com/EmiliyaShtereva/Manga-Store/assets/123276538/ede711c3-7e47-4223-b33c-6a925966aaf9)
 
